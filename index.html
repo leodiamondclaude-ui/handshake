@@ -96,6 +96,10 @@ main { min-height: 70vh; }
 .card .c-name { font: 600 1.38em/1.05 var(--display); letter-spacing: -0.025em; overflow-wrap: anywhere; }
 .card .c-role { font: 500 .6em/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase; opacity: .68; margin-top: .5em; overflow-wrap: anywhere; }
 .card.onyx { --c-bg: radial-gradient(130% 90% at 20% 0%, #24262c 0%, #0d0e11 55%, #060608 100%); --c-ink: #e8e9ec; --c-sheen: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.07) 48%, transparent 60%); }
+.card.engraved .c-name, .card.engraved .c-role, .card.engraved .c-mark { filter: drop-shadow(0 -1px 0 rgba(0,0,0,.85)) drop-shadow(0 1px 0 rgba(255,255,255,.12)); }
+.card.engraved .c-role { color: #9da1a9; opacity: 1; }
+.card.engraved .c-logo { filter: grayscale(1) brightness(0) invert(.8) drop-shadow(0 -1px 0 rgba(0,0,0,.85)); }
+.card.plain .c-body .c-role { opacity: .45; }
 .card.onyx .c-name, .card.onyx .c-mark { background: linear-gradient(180deg, #f4f5f7, #a9adb5); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .card.f-gloss { --c-sheen: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.28) 45%, transparent 58%), radial-gradient(120% 80% at 10% 0%, rgba(255,255,255,.22), transparent 55%); }
 .card.f-matte { --c-sheen: radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,.1), transparent 60%); }
@@ -160,7 +164,7 @@ main { min-height: 70vh; }
 .tile:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); box-shadow: 0 30px 50px -36px rgba(10,14,30,.45); }
 .tile .shot { border-radius: 16px; aspect-ratio: 4 / 3; display: grid; place-items: center; padding: 14%; position: relative; overflow: hidden; }
 .tile .shot.s-onyx { background: radial-gradient(90% 80% at 50% 20%, #2a2d36, #0b0c10); }
-.tile .shot.s-custom { background: conic-gradient(from 210deg at 50% 50%, #ffd8c2, #f5b4d0, #c9c3ff, #b6e3ff, #c8f2d8, #ffd8c2); }
+.tile .shot.s-custom { background: radial-gradient(90% 80% at 50% 20%, #3a3d46, #101115 70%, #08090b); }
 .tile .shot.s-pack { background: radial-gradient(90% 80% at 50% 20%, #e4e8f2, #c7cede); }
 .tile .card, .tile .stack { --w: 100%; font-size: clamp(9px, 1.1vw, 12px); transition: transform .5s var(--ease); }
 .tile:hover .shot > .card { transform: rotate(-3deg) scale(1.04); }
@@ -177,7 +181,7 @@ main { min-height: 70vh; }
 @media (max-width: 900px) { .tiers { grid-template-columns: 1fr; max-width: 520px; } }
 
 /* Specs + steps */
-@media (max-width: 760px) { .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
 .step { padding: 28px 28px 8px 0; min-width: 0; }
 .step + .step { padding-left: 28px; border-left: 1px solid var(--line); }
 .step .n { font: 500 12px/1 var(--mono); color: var(--signal); }
@@ -221,8 +225,7 @@ main { min-height: 70vh; }
 .pdp { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; padding-block: 22px 96px; align-items: start; }
 .pdp > * { min-width: 0; }
 .viewer { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 86px); border-radius: 28px; padding: clamp(36px, 7vw, 88px) clamp(20px, 4vw, 48px) 28px; display: grid; place-items: center; gap: 28px; perspective: 1400px; overflow: hidden; isolation: isolate; }
-.viewer.v-onyx, .viewer.v-pack { background: radial-gradient(100% 80% at 50% 10%, #262932, #08090c 80%); }
-.viewer.v-custom { background: radial-gradient(100% 80% at 50% 10%, color-mix(in srgb, var(--pick, #2b47ff) 30%, #fff), color-mix(in srgb, var(--pick, #2b47ff) 12%, #e9ebf0) 80%); }
+.viewer.v-onyx, .viewer.v-custom, .viewer.v-pack { background: radial-gradient(100% 80% at 50% 10%, #262932, #08090c 80%); }
 .viewer .flip { --w: 460px; width: min(var(--w), 100%); max-width: 100%; position: relative; transform-style: preserve-3d; transition: transform .8s var(--ease); font-size: clamp(11px, 2.6vw, 19px); }
 .viewer .flip.flipped { transform: rotateY(180deg); }
 .viewer .flip > .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -232,7 +235,6 @@ main { min-height: 70vh; }
 .viewer .tools { display: flex; gap: 8px; }
 .chip-btn { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; backdrop-filter: blur(8px); transition: background .2s; }
 .chip-btn:hover { background: rgba(255,255,255,.16); }
-.v-custom .chip-btn { border-color: rgba(0,0,0,.12); background: rgba(255,255,255,.6); color: #101217; }
 .buy .label { display: block; }
 .buy h1 { font-size: clamp(40px, 5vw, 60px); margin: 14px 0 12px; letter-spacing: -0.04em; }
 .price-lg { font: 500 22px/1 var(--mono); font-variant-numeric: tabular-nums; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
@@ -348,8 +350,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     { size: 10, price: 79 },
   ];
   const PRODUCTS = {
-    onyx:   { id: "onyx",   name: "Onyx",          price: 19, kicker: "Matte black, metal-look print", blurb: "Deep matte black with a soft brushed-silver print. One card, your name, nothing extra. The one most people start with.", weight: "5 g" },
-    custom: { id: "custom", name: "Customized",    price: 29, kicker: "Your colors, your logo",         blurb: "Pick any color, choose a finish and add your own logo. The preview updates as you go, and that's what we print.", weight: "5 to 18 g" },
+    onyx:   { id: "onyx",   name: "Onyx",          price: 19, kicker: "Matte black, ready to tap", blurb: "Our matte black card, exactly as shown, with nothing to set up at checkout. Link it to your profile when it arrives. To have your name, title or logo engraved on it, choose Customized.", weight: "5 g" },
+    custom: { id: "custom", name: "Customized",    price: 29, kicker: "Onyx, engraved with your details", blurb: "The same matte black Onyx card, laser-engraved with your name, title and logo. Type below and the preview shows what we engrave.", weight: "5 g" },
     pack:   { id: "pack",   name: "Business Pack", price: PACKS[0].price, kicker: "Matching cards for a team",  blurb: "Matching cards for your whole team with your company logo on every one. Add everyone's name and we print and program each card.", weight: "5 g each" },
   };
   const COLORS = ["#2b47ff", "#0e0f12", "#f4f1ea", "#e8483b", "#1f7a5a", "#f2b630", "#8e6cf0", "#ff8fb1"];
@@ -389,7 +391,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   // Card markup. o: { kind, name, role, color, finish, logo, company, back }
   function card(o) {
     let cls = "card", style = "", mark = "Handshake";
-    if (o.kind === "onyx") cls += " onyx";
+    if (o.kind === "onyx") cls += " onyx plain";
+    else if (o.kind === "engraved") cls += " onyx engraved";
     else {
       cls += " f-" + (o.finish || "gloss");
       const c = o.color || "#2b47ff";
@@ -398,9 +401,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     }
     const brand = o.logo ? `<img class="c-logo" src="${o.logo}" alt="">` : `<span class="c-mark">${esc(mark)}</span>`;
     if (o.back) return `<div class="${cls} card-back" style="${style}">${WAVE}<span class="c-tap">Tap to connect</span></div>`;
-    return `<div class="${cls}" style="${style}" role="img" aria-label="Card preview for ${esc(o.name)}">
+    return `<div class="${cls}" style="${style}" role="img" aria-label="${o.kind === "onyx" ? "Onyx card preview" : "Card preview for " + esc(o.name)}">
       <div class="c-top">${brand}${WAVE}</div>
-      <div class="c-body"><div class="c-name">${esc(o.name)}</div><div class="c-role">${esc(o.role)}</div></div>
+      <div class="c-body">${o.kind === "onyx" ? `<div class="c-role">Tap to connect</div>` : `<div class="c-name">${esc(o.name)}</div><div class="c-role">${esc(o.role)}</div>`}</div>
     </div>`;
   }
   function stack(o, vt) {
@@ -409,8 +412,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     return `<div class="stack"${vt ? ` style="view-transition-name:${vt}"` : ""}><span class="ghost-card g2" style="--c-bg:${bg}"></span><span class="ghost-card g1" style="--c-bg:${bg}"></span>${card(o)}</div>`;
   }
   const packCard = () => ({ kind: "pack", name: teamNames()[0] || "Team member", role: draft.company, color: draft.color, finish: draft.finish, logo: draft.logo, company: draft.company });
-  const customCard = () => ({ kind: "custom", name: draft.name, role: draft.role, color: draft.color, finish: draft.finish, logo: draft.logo });
-  const onyxCard = () => ({ kind: "onyx", name: draft.name, role: draft.role });
+  const customCard = () => ({ kind: "engraved", name: draft.name, role: draft.role, logo: draft.logo });
+  const onyxCard = () => ({ kind: "onyx" });
   const teamNames = () => draft.team.split("\n").map(s => s.trim()).filter(Boolean);
   const wrapVT = (html, vt) => `<div style="view-transition-name:${vt};width:100%;display:grid;place-items:center">${html}</div>`;
 
@@ -428,7 +431,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         </div></a>`;
     };
     const onyx = card(onyxCard());
-    const custom = card({ kind: "custom", name: draft.name, role: draft.role, color: "#2b47ff", finish: "gloss" });
+    const custom = card({ kind: "engraved", name: draft.name, role: draft.role });
     return `<div class="tiers">
       ${t("onyx", withVT ? wrapVT(onyx, vt("onyx")) : onyx, `<span class="badge">Most popular</span>`)}
       ${t("custom", withVT ? wrapVT(custom, vt("custom")) : custom)}
@@ -447,7 +450,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <p class="lede">Tap a Handshake card on any phone and your contact details, socials and portfolio open right away. They don't need an app, and you can change your details without reprinting.</p>
             <div class="actions">
               <a class="btn primary" href="#shop">Shop cards ${ARROW}</a>
-              <a class="btn on-night" href="#card-onyx">See Onyx</a>
+              <a class="btn on-night" href="#card-custom">Engrave yours</a>
             </div>
             <div class="fine">
               <span>${CHECK}No app needed</span>
@@ -457,7 +460,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           </div>
           <div class="stage" aria-hidden="true">
             <div class="rings"><span></span><span></span><span></span></div>
-            <div class="float" style="view-transition-name:card-onyx">${card(onyxCard())}</div>
+            <div class="float" style="view-transition-name:card-custom">${card(customCard())}</div>
             <div class="shadow"></div>
             <div class="tag-float t1"><span class="ico">+</span><div><b>Contact saved</b><small>Alex Rivera, just now</small></div></div>
             <div class="tag-float t2"><span class="ico">in</span><div><b>Profile opened</b><small>No app required</small></div></div>
@@ -476,7 +479,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <section class="wrap section">
         <div class="section-head"><span class="label">How it works</span><h2>From box to first tap in minutes.</h2></div>
         <div class="steps">
-          <div class="step"><span class="n">Step 1</span><h3>Choose your card</h3><p>Go with Onyx, design your own with Customized, or get a Business Pack for your team.</p></div>
+          <div class="step"><span class="n">Step 1</span><h3>Choose your card</h3><p>Take Onyx as it comes, get it engraved with your name and logo as Customized, or order a Business Pack for your team.</p></div>
           <div class="step"><span class="n">Step 2</span><h3>Set up your profile</h3><p>When your card arrives, link it to a profile page with your contact details, socials and files.</p></div>
           <div class="step"><span class="n">Step 3</span><h3>Tap to share</h3><p>Hold the card near the top of any NFC phone and your profile opens in their browser.</p></div>
         </div>
@@ -487,6 +490,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div class="section-head" style="margin:0"><span class="label">Questions</span><h2>Good to know.</h2></div>
           <div>
             <details open><summary>Does the other person need an app?</summary><p>No. iPhones (XS and newer) and most Android phones read NFC on their own. Your profile opens in their web browser.</p></details>
+            <details><summary>What is the difference between Onyx and Customized?</summary><p>They are the same matte black card. Onyx comes blank, and Customized is laser-engraved with your name, title and logo.</p></details>
             <details><summary>Can I change my details after it's printed?</summary><p>Yes. The card links to your profile, so when you update the profile, every tap shows the new version.</p></details>
                         <details><summary>How does the Business Pack work?</summary><p>You get ${PACKS[0].size} matching cards. Upload your logo and list your team's names. We print and program a card for each person.</p></details>
           </div>
@@ -513,10 +517,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <tbody>
               <tr><th scope="row">Price</th>${y(money(PRODUCTS.onyx.price))}${y(money(PRODUCTS.custom.price))}${y(money(PACKS[0].price))}</tr>
               <tr><th scope="row">Cards</th>${y("1")}${y("1")}${y(String(PACKS[0].size))}</tr>
-              <tr><th scope="row">Card color</th>${y("Matte black")}${y("Any color")}${y("Any color")}</tr>
-              <tr><th scope="row">Your logo</th>${n("No")}${y("Yes")}${y("Yes, on every card")}</tr>
-              <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte, gloss or metal")}${y("Matte, gloss or metal")}</tr>
-              <tr><th scope="row">Names printed</th>${y("Yours")}${y("Yours")}${y("One per team member")}</tr>
+              <tr><th scope="row">Card color</th>${y("Matte black")}${y("Matte black (Onyx)")}${y("Any color")}</tr>
+              <tr><th scope="row">Engraving</th>${n("None")}${y("Name, title and logo")}${y("Name and company logo")}</tr>
+              <tr><th scope="row">Your logo</th>${n("No")}${y("Yes, engraved")}${y("Yes, on every card")}</tr>
+              <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte")}${y("Matte, gloss or metal")}</tr>
+              <tr><th scope="row">Names printed</th>${n("None")}${y("Yours")}${y("One per team member")}</tr>
             </tbody>
           </table>
         </div>
@@ -529,11 +534,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       if (id === "onyx") {
         preview = card(onyxCard());
         priceHtml = `<span class="price-lg" id="price">${money(p.price)}</span>`;
-        fields = nameFields();
+        fields = "";
       } else if (id === "custom") {
         preview = card(customCard());
         priceHtml = `<span class="price-lg" id="price">${money(customPrice())}</span>`;
-        fields = nameFields() + colorField() + finishField() + logoField("Shown in the top-left corner. Use a PNG or SVG with a transparent background.");
+        fields = nameFields() + logoField("Engraved in the top-left corner. Use a PNG or SVG with a transparent background.");
       } else {
         preview = stack(packCard());
         priceHtml = `<span class="price-lg"><span id="price">${money(packPrice())}</span><small id="per">${perCard()}</small></span>`;
@@ -639,7 +644,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <label for="f-logo">${draft.logo ? "Replace" : "Choose file"}</label><input type="file" id="f-logo" accept="image/*">
       </div></div>`;
   }
-  const customPrice = () => PRODUCTS.custom.price + FINISHES[draft.finish].add;
+  const customPrice = () => PRODUCTS.custom.price;
   const packInfo = () => PACKS.find(k => k.size === draft.packSize) || PACKS[0];
   const packPrice = () => packInfo().price + FINISHES[draft.finish].add;
   const perCard = () => `${money(packPrice() / packInfo().size)} per card`;
@@ -766,8 +771,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     $("add").onclick = () => {
       const o = cardObj();
       let unit, desc;
-      if (id === "onyx") { unit = PRODUCTS.onyx.price; desc = `${draft.name} · ${draft.role}`; }
-      else if (id === "custom") { unit = customPrice(); desc = `${draft.name} · ${FINISHES[draft.finish].label} · ${draft.color.toUpperCase()}${draft.logo ? " · Logo" : ""}`; }
+      if (id === "onyx") { unit = PRODUCTS.onyx.price; desc = "Matte black, no engraving"; }
+      else if (id === "custom") { unit = customPrice(); desc = `Engraved Onyx · ${draft.name} · ${draft.role}${draft.logo ? " · Logo" : ""}`; }
       else { unit = packPrice(); q = 1; desc = `${draft.packSize} cards · ${draft.company} · ${teamNames().length} names · ${FINISHES[draft.finish].label}`; }
       const key = JSON.stringify([id, desc, o.logo || ""]);
       const hit = cart.find(l => l.key === key);
