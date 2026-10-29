@@ -177,12 +177,7 @@ main { min-height: 70vh; }
 @media (max-width: 900px) { .tiers { grid-template-columns: 1fr; max-width: 520px; } }
 
 /* Specs + steps */
-.specs { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
-.specs div { padding: 26px 24px; border-left: 1px solid var(--line); min-width: 0; }
-.specs div:first-child { border-left: 0; }
-.specs b { display: block; font: 600 28px/1.1 var(--display); letter-spacing: -0.025em; margin-top: 12px; font-variant-numeric: tabular-nums; }
-@media (max-width: 760px) { .specs { grid-template-columns: 1fr 1fr; } .specs div:nth-child(3) { border-left: 0; } .specs div:nth-child(n+3) { border-top: 1px solid var(--line); } }
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
+@media (max-width: 760px) { .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
 .step { padding: 28px 28px 8px 0; min-width: 0; }
 .step + .step { padding-left: 28px; border-left: 1px solid var(--line); }
 .step .n { font: 500 12px/1 var(--mono); color: var(--signal); }
@@ -348,18 +343,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 <script>
 (() => {
   // Placeholder prices until the owner confirms real ones.
+  // Pack size is a placeholder until the owner confirms how many cards the pack includes.
   const PACKS = [
-    { size: 5,  price: 149 },
-    { size: 10, price: 269 },
-    { size: 25, price: 599 },
+    { size: 10, price: 79 },
   ];
   const PRODUCTS = {
-    onyx:   { id: "onyx",   name: "Onyx",          price: 39, kicker: "Matte black, metal-look print", blurb: "Deep matte black with a soft brushed-silver print. One card, your name, nothing extra. The one most people start with.", weight: "5 g" },
-    custom: { id: "custom", name: "Customized",    price: 59, kicker: "Your colors, your logo",         blurb: "Pick any color, choose a finish and add your own logo. The preview updates as you go, and that's what we print.", weight: "5 to 18 g" },
+    onyx:   { id: "onyx",   name: "Onyx",          price: 19, kicker: "Matte black, metal-look print", blurb: "Deep matte black with a soft brushed-silver print. One card, your name, nothing extra. The one most people start with.", weight: "5 g" },
+    custom: { id: "custom", name: "Customized",    price: 29, kicker: "Your colors, your logo",         blurb: "Pick any color, choose a finish and add your own logo. The preview updates as you go, and that's what we print.", weight: "5 to 18 g" },
     pack:   { id: "pack",   name: "Business Pack", price: PACKS[0].price, kicker: "Matching cards for a team",  blurb: "Matching cards for your whole team with your company logo on every one. Add everyone's name and we print and program each card.", weight: "5 g each" },
   };
   const COLORS = ["#2b47ff", "#0e0f12", "#f4f1ea", "#e8483b", "#1f7a5a", "#f2b630", "#8e6cf0", "#ff8fb1"];
-  const FINISHES = { matte: { label: "Matte", add: 0 }, gloss: { label: "Gloss", add: 0 }, metal: { label: "Metal", add: 30 } };
+  const FINISHES = { matte: { label: "Matte", add: 0 }, gloss: { label: "Gloss", add: 0 }, metal: { label: "Metal", add: 10 } };
 
   const money = n => "$" + n.toFixed(2).replace(/\.00$/, "");
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -424,7 +418,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const vt = id => withVT ? "card-" + id : null;
     const t = (id, shot, extra = "") => {
       const p = PRODUCTS[id];
-      const price = id === "pack" ? `<span class="price"><small>from</small> ${money(PACKS[0].price)}</span>` : `<span class="price">${money(p.price)}</span>`;
+      const price = id === "pack" ? `<span class="price">${money(PACKS[0].price)}</span>` : `<span class="price">${money(p.price)}</span>`;
       return `<a class="tile" href="#card-${id}">${extra}
         <div class="shot s-${id}">${shot}</div>
         <div class="body">
@@ -479,15 +473,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         ${tiles(false)}
       </section>
 
-      <section class="wrap">
-        <div class="specs">
-          <div><span class="label">Chip</span><b>NTAG216</b></div>
-          <div><span class="label">Memory</span><b>888 bytes</b></div>
-          <div><span class="label">Tap range</span><b>1 to 4 cm</b></div>
-          <div><span class="label">Rated for</span><b>100k taps</b></div>
-        </div>
-      </section>
-
       <section class="wrap section">
         <div class="section-head"><span class="label">How it works</span><h2>From box to first tap in minutes.</h2></div>
         <div class="steps">
@@ -503,7 +488,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div>
             <details open><summary>Does the other person need an app?</summary><p>No. iPhones (XS and newer) and most Android phones read NFC on their own. Your profile opens in their web browser.</p></details>
             <details><summary>Can I change my details after it's printed?</summary><p>Yes. The card links to your profile, so when you update the profile, every tap shows the new version.</p></details>
-                        <details><summary>How does the Business Pack work?</summary><p>Choose 5, 10 or 25 cards, upload your logo and list your team's names. We print and program a card for each person.</p></details>
+                        <details><summary>How does the Business Pack work?</summary><p>You get ${PACKS[0].size} matching cards. Upload your logo and list your team's names. We print and program a card for each person.</p></details>
           </div>
         </div>
       </section>
@@ -526,8 +511,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <table>
             <thead><tr><th scope="col"><span class="label">Compare</span></th><th scope="col">Onyx</th><th scope="col">Customized</th><th scope="col">Business Pack</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Price</th>${y(money(PRODUCTS.onyx.price))}${y(money(PRODUCTS.custom.price))}${y("from " + money(PACKS[0].price))}</tr>
-              <tr><th scope="row">Cards</th>${y("1")}${y("1")}${y("5, 10 or 25")}</tr>
+              <tr><th scope="row">Price</th>${y(money(PRODUCTS.onyx.price))}${y(money(PRODUCTS.custom.price))}${y(money(PACKS[0].price))}</tr>
+              <tr><th scope="row">Cards</th>${y("1")}${y("1")}${y(String(PACKS[0].size))}</tr>
               <tr><th scope="row">Card color</th>${y("Matte black")}${y("Any color")}${y("Any color")}</tr>
               <tr><th scope="row">Your logo</th>${n("No")}${y("Yes")}${y("Yes, on every card")}</tr>
               <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte, gloss or metal")}${y("Matte, gloss or metal")}</tr>
@@ -553,15 +538,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         preview = stack(packCard());
         priceHtml = `<span class="price-lg"><span id="price">${money(packPrice())}</span><small id="per">${perCard()}</small></span>`;
         fields = `
-          <div class="field"><span class="flabel">Pack size</span>
+          ${PACKS.length < 2 ? "" : `<div class="field"><span class="flabel">Pack size</span>
             <div class="seg" id="packSeg">${PACKS.map(k => `<button type="button" data-size="${k.size}" aria-pressed="${k.size === draft.packSize}">${k.size} cards<small>${money(k.price)}</small></button>`).join("")}</div>
-          </div>
+          </div>`}
           <div class="field"><label for="f-company">Company name</label><input type="text" id="f-company" maxlength="30" value="${esc(draft.company)}"></div>
           <div class="field"><label for="f-team">Team names <span id="teamCount"></span></label><textarea id="f-team" rows="5">${esc(draft.team)}</textarea></div>
           ${colorField()}${finishField()}${logoField("Printed on every card in the pack.")}`;
       }
       facts = `<dl class="facts">
-        <div><dt>Chip</dt><dd>NTAG216, 888 bytes</dd></div>
         <div><dt>Size</dt><dd>85.6 × 54 mm (ISO ID-1)</dd></div>
         <div><dt>Weight</dt><dd>${p.weight}</dd></div>
         <div><dt>Ships in</dt><dd>3 to 5 business days</dd></div>
@@ -657,7 +641,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   }
   const customPrice = () => PRODUCTS.custom.price + FINISHES[draft.finish].add;
   const packInfo = () => PACKS.find(k => k.size === draft.packSize) || PACKS[0];
-  const packPrice = () => packInfo().price + FINISHES[draft.finish].add * packInfo().size;
+  const packPrice = () => packInfo().price + FINISHES[draft.finish].add;
   const perCard = () => `${money(packPrice() / packInfo().size)} per card`;
 
   const view = document.getElementById("view");
@@ -691,7 +675,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function go() {
     const top = () => window.scrollTo({ top: 0, behavior: "instant" });
     if (first) { first = false; render(); return; }
-    if (document.startViewTransition && !reduced()) document.startViewTransition(() => { render(); top(); });
+    if (document.startViewTransition && !reduced()) document.startViewTransition(() => { render(); top(); }).ready.catch(() => {});
     else { render(); top(); view.classList.remove("fallback-in"); void view.offsetWidth; view.classList.add("fallback-in"); }
   }
 
@@ -801,7 +785,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       else if (b.dataset.dec != null) cart[i].qty > 1 ? cart[i].qty-- : cart.splice(i, 1);
       else cart.splice(i, 1);
       save(); updateCount();
-      document.startViewTransition && !reduced() ? document.startViewTransition(render) : render();
+      document.startViewTransition && !reduced() ? document.startViewTransition(render).ready.catch(() => {}) : render();
     }));
     const co = document.getElementById("checkout");
     if (co) co.onclick = () => toast("Checkout is coming soon. This is a demo store.");
