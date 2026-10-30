@@ -1,0 +1,39 @@
+<!doctype html>
+<!--
+  Marketing email: send ONLY to people who ticked the optional "Email me about new
+  cards and offers" box. Required by CAN-SPAM, GDPR and CASL:
+  - a working one-click unsubscribe link, honored within 10 business days (do it immediately)
+  - the business's physical postal address
+  - an honest subject line and sender name
+  Also set the List-Unsubscribe and List-Unsubscribe-Post headers in your email
+  provider so mail apps show their own unsubscribe button.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{subject}}</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Helvetica,Arial,sans-serif;color:#101217;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;">
+  <tr><td align="center" style="padding:32px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;">
+      <tr><td style="padding:32px;">
+        <p style="margin:0 0 24px;font-size:20px;font-weight:bold;">Handshake</p>
+        <h1 style="margin:0 0 12px;font-size:24px;">{{headline}}</h1>
+        <div style="font-size:16px;line-height:1.5;color:#3d4350;">{{body}}</div>
+        <p style="margin:28px 0 0;"><a href="{{cta_url}}" style="display:inline-block;background:#2b47ff;color:#ffffff;text-decoration:none;font-weight:bold;padding:14px 22px;border-radius:999px;">{{cta_label}}</a></p>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+      <tr><td style="padding:20px 32px;font-size:12px;line-height:1.6;color:#5d6471;">
+        You're getting this because you asked for Handshake news when you ordered on {{optin_date}}.<br>
+        <a href="{{unsubscribe_url}}" style="color:#101217;font-weight:bold;">Unsubscribe</a> with one click. You'll still get emails about orders you place.<br>
+        {{business_legal_name}}, {{business_address}}<br>
+        <a href="{{privacy_url}}" style="color:#5d6471;">Privacy policy</a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

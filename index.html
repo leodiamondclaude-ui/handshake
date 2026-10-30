@@ -1,9 +1,11 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Handshake</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
+/* Fonts are self-hosted (no requests to Google). All three are SIL Open Font License 1.1; see fonts/OFL-*.txt. */
+@font-face { font-family: "Bricolage Grotesque"; font-style: normal; font-weight: 400 800; font-stretch: 100%; font-display: swap; src: url("fonts/BricolageGrotesque-latin.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 400 600; font-stretch: 100%; font-display: swap; src: url("fonts/InstrumentSans-latin.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400 500; font-display: swap; src: url("fonts/JetBrainsMono-latin.woff2") format("woff2"); }
 /* Layout: sticky header over a routed <main>. Home opens on a dark spotlight band, then light sections.
    Views cross-fade; the product card morphs between shop and product pages. */
 :root {
@@ -14,6 +16,10 @@
   --line: #dde0e6;
   --signal: #2b47ff;
   --signal-ink: #ffffff;
+  --signal-fill: #2b47ff;
+  --danger: #b42318;
+  --warn-bg: #fff4d6;
+  --warn-ink: #5c4300;
   --night: #07080b;
   --night-ink: #f2f3f5;
   --night-muted: #9aa1ad;
@@ -28,14 +34,15 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #0c0d11; --surface: #15171d; --ink: #eef0f3; --muted: #9aa1ad;
-    --line: #242833; --signal: #6077ff; color-scheme: dark;
+    --line: #242833; --signal: #6077ff; --danger: #ff8a80; --warn-bg: #3a2f10; --warn-ink: #ffe3a3; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #0c0d11; --surface: #15171d; --ink: #eef0f3; --muted: #9aa1ad;
-  --line: #242833; --signal: #6077ff; color-scheme: dark;
+  --line: #242833; --signal: #6077ff; --danger: #ff8a80; --warn-bg: #3a2f10; --warn-ink: #ffe3a3; color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
 a { color: inherit; }
@@ -75,8 +82,8 @@ main { min-height: 70vh; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 15px 24px; font-weight: 600; text-decoration: none; border: 1px solid transparent; transition: transform .25s var(--ease), background .2s, box-shadow .25s, border-color .2s; white-space: nowrap; }
 .btn:active { transform: scale(.97); }
-.btn.primary { background: var(--signal); color: var(--signal-ink); box-shadow: 0 12px 28px -14px var(--signal); }
-.btn.primary:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -14px var(--signal); }
+.btn.primary { background: var(--signal-fill); color: var(--signal-ink); box-shadow: 0 12px 28px -14px var(--signal-fill); }
+.btn.primary:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -14px var(--signal-fill); }
 .btn.ghost { border-color: var(--line); background: var(--surface); }
 .btn.ghost:hover { border-color: var(--ink); }
 .btn.on-night { border-color: rgba(255,255,255,.18); color: var(--night-ink); background: rgba(255,255,255,.04); }
@@ -99,7 +106,7 @@ main { min-height: 70vh; }
 .card.engraved .c-name, .card.engraved .c-role, .card.engraved .c-mark { filter: drop-shadow(0 -1px 0 rgba(0,0,0,.85)) drop-shadow(0 1px 0 rgba(255,255,255,.12)); }
 .card.engraved .c-role { color: #9da1a9; opacity: 1; }
 .card.engraved .c-logo { filter: grayscale(1) brightness(0) invert(.8) drop-shadow(0 -1px 0 rgba(0,0,0,.85)); }
-.card.plain .c-body .c-role { opacity: .45; }
+.card.plain .c-body .c-role { opacity: .6; }
 .card.onyx .c-name, .card.onyx .c-mark { background: linear-gradient(180deg, #f4f5f7, #a9adb5); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .card.f-gloss { --c-sheen: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.28) 45%, transparent 58%), radial-gradient(120% 80% at 10% 0%, rgba(255,255,255,.22), transparent 55%); }
 .card.f-matte { --c-sheen: radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,.1), transparent 60%); }
@@ -126,7 +133,7 @@ main { min-height: 70vh; }
 .hero .label { color: var(--night-muted); display: inline-flex; gap: 10px; align-items: center; }
 .hero .label .dot { width: 7px; height: 7px; border-radius: 50%; background: #5dd39e; box-shadow: 0 0 0 4px rgba(93,211,158,.18); }
 .hero h1 { font-size: clamp(50px, 8vw, 112px); margin-top: 22px; line-height: .94; letter-spacing: -0.045em; }
-.hero h1 .soft { color: transparent; -webkit-text-stroke: 1.5px rgba(242,243,245,.55); }
+.hero h1 .soft { color: transparent; -webkit-text-stroke: 1.5px #c9ccd2; }
 .hero p.lede { font-size: clamp(17px, 1.6vw, 20px); color: var(--night-muted); max-width: 44ch; margin: 26px 0 34px; }
 .hero .fine { margin-top: 26px; display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: var(--night-muted); }
 .hero .fine span { display: inline-flex; gap: 8px; align-items: center; }
@@ -174,7 +181,6 @@ main { min-height: 70vh; }
 .tile .price { font: 500 15px/1 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile .price small { color: var(--muted); font-size: 12px; }
 .tile p { color: var(--muted); font-size: 15px; }
-.tile .badge { position: absolute; top: 26px; left: 26px; z-index: 4; font: 500 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; background: var(--surface); color: var(--ink); padding: 7px 10px; border-radius: 999px; box-shadow: 0 4px 14px -6px rgba(0,0,0,.4); }
 .tile .go { margin-top: 4px; font-weight: 600; font-size: 15px; display: inline-flex; gap: 8px; align-items: center; }
 .tile .go .arrow { transition: transform .25s var(--ease); }
 .tile:hover .go .arrow { transform: translateX(4px); }
@@ -266,7 +272,9 @@ main { min-height: 70vh; }
 .upload .txt { flex: 1; min-width: 0; font-size: 14px; }
 .upload .txt b { display: block; font-weight: 600; }
 .upload .txt span { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
-.upload input { display: none; }
+.upload input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.upload:focus-within { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 18%, transparent); }
+.upload { position: relative; }
 .upload label { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--signal); white-space: nowrap; }
 .qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); flex: none; }
 .qty button { width: 44px; height: 48px; border: 0; background: none; font-size: 18px; border-radius: 999px; }
@@ -295,8 +303,6 @@ main { min-height: 70vh; }
 .summary h3 { font-size: 22px; font-weight: 600; margin-bottom: 14px; }
 .summary .row { display: flex; justify-content: space-between; padding: 9px 0; font-variant-numeric: tabular-nums; }
 .summary .row.total { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 18px; font-weight: 600; font-size: 19px; }
-.meter { height: 6px; border-radius: 6px; background: var(--paper); overflow: hidden; margin: 6px 0 4px; }
-.meter i { display: block; height: 100%; background: var(--signal); border-radius: 6px; transition: width .6s var(--ease); }
 .summary .note { font-size: 13px; color: var(--muted); margin-top: 14px; }
 .empty { text-align: center; padding-block: 40px 120px; display: grid; justify-items: center; gap: 18px; }
 .empty p { color: var(--muted); }
@@ -314,8 +320,70 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   .fallback-in, .rings span, .float, .stage .shadow, .tag-float { animation: none !important; }
   .viewer .flip { transition: none; }
 }
+
+/* Accessibility helpers */
+.skip { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); top: calc(env(safe-area-inset-top, 0px) + 10px); z-index: 50; background: var(--ink); color: var(--paper); border: 0; padding: 10px 16px; border-radius: 999px; font-weight: 600; transform: translateY(-160%); transition: transform .2s var(--ease); }
+.skip:focus { transform: none; }
+main:focus, [tabindex="-1"]:focus { outline: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.field .err { color: var(--danger); font-size: 13px; font-weight: 500; }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: var(--danger); }
+.ship-note { margin-top: 12px; font-size: 14px; color: var(--muted); }
+
+/* Consent checkboxes */
+.check { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 14px; margin-top: 14px; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--signal-fill); }
+.check a { color: var(--ink); }
+.check small { display: block; color: var(--muted); font-size: 13px; }
+
+/* Reviews */
+.reviews-empty { border: 1px dashed var(--line); border-radius: 22px; padding: clamp(28px, 5vw, 48px); display: grid; gap: 10px; justify-items: start; background: var(--surface); }
+.reviews-empty h3 { font-size: 22px; font-weight: 600; }
+.reviews-empty p { color: var(--muted); max-width: 60ch; }
+.review-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.review { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: grid; gap: 10px; min-width: 0; }
+.review .stars { font: 500 13px/1 var(--mono); }
+.review p { color: var(--ink); }
+.review footer { border: 0; padding: 0; font-size: 13px; color: var(--muted); }
+
+/* Legal pages */
+.legal { padding-block: 0 96px; display: grid; grid-template-columns: 220px 1fr; gap: 48px; align-items: start; }
+.legal > * { min-width: 0; }
+.legal nav { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 86px); display: grid; gap: 4px; }
+.legal nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; font-weight: 500; }
+.legal nav a[aria-current="page"] { color: var(--ink); background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
+.prose { max-width: 70ch; }
+.prose h2 { font-size: 24px; font-weight: 600; margin: 36px 0 12px; }
+.prose p, .prose li { color: var(--ink); margin: 0 0 12px; }
+.prose ul { padding-left: 20px; margin: 0 0 12px; }
+.prose table { border-collapse: collapse; width: 100%; font-size: 14px; margin-bottom: 16px; }
+.prose th, .prose td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.prose .tbl { overflow-x: auto; }
+.draft { background: var(--warn-bg); color: var(--warn-ink); border-radius: 14px; padding: 14px 16px; font-size: 14px; margin-bottom: 24px; }
+.ph { background: var(--warn-bg); color: var(--warn-ink); border-radius: 4px; padding: 0 4px; }
+@media (max-width: 860px) { .legal { grid-template-columns: 1fr; gap: 16px; } .legal nav { position: static; display: flex; flex-wrap: wrap; } }
+
+/* Footer */
+footer .cols { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 32px; }
+footer .cols > * { min-width: 0; }
+footer h2 { font: 600 14px/1 var(--body); color: var(--ink); margin: 0 0 14px; letter-spacing: 0; }
+footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+footer a, footer .link-btn { color: var(--muted); font-size: 14px; }
+footer a:hover, footer .link-btn:hover { color: var(--ink); }
+footer address { font-style: normal; display: grid; gap: 4px; }
+footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+@media (max-width: 760px) { footer .cols { grid-template-columns: 1fr; } }
+
+/* Cookie notice */
+.cookie { position: fixed; z-index: 40; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(420px, calc(100% - 32px)); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: 0 30px 60px -30px rgba(5,8,20,.5); display: grid; gap: 12px; }
+.cookie h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.cookie p { font-size: 14px; color: var(--muted); }
+.cookie .actions { gap: 8px; }
+.cookie .btn { padding: 10px 18px; font-size: 14px; }
 </style>
 </head><body>
+
+<button type="button" class="skip" id="skip">Skip to main content</button>
 
 <header class="top">
   <div class="wrap">
@@ -327,41 +395,69 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <a href="#home" data-nav="home" class="hide-sm">Home</a>
       <a href="#shop" data-nav="shop">Shop</a>
     </nav>
-    <a class="cart-btn" href="#cart" aria-label="Cart">Cart <span class="count" id="cartCount">0</span></a>
+    <a class="cart-btn" href="#cart"><span>Cart</span> <span class="count" id="cartCount">0</span><span class="sr-only"> items</span></a>
   </div>
 </header>
 
-<main id="view"></main>
+<main id="view" tabindex="-1"></main>
 
 <footer>
-  <div class="wrap">
-    <span>Handshake NFC cards. Demo storefront, no real orders are placed.</span>
-    <span>Works with iPhone XS and newer, and most NFC-enabled Android phones.</span>
-  </div>
+  <div class="wrap" id="footer"></div>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<section class="cookie" id="cookie" aria-labelledby="cookie-title" hidden>
+  <h2 id="cookie-title">Cookies and storage</h2>
+  <p>This shop only stores what it needs to work: your cart and this notice's setting, kept in your browser. We don't use analytics, advertising or tracking cookies, so there is nothing to opt in to.</p>
+  <div class="actions">
+    <button type="button" class="btn primary" id="cookieOk">OK</button>
+    <a class="btn ghost" href="#cookies">Read the cookie policy</a>
+  </div>
+</section>
+
 <script>
 (() => {
-  // Placeholder prices until the owner confirms real ones.
+  // Business details. Placeholders in [brackets] must be replaced before launch;
+  // they appear in the footer, legal pages and emails.
+  const BUSINESS = {
+    legalName: "[Legal business name]",
+    address: "[Street address, City, State ZIP, Country]",
+    email: "[support@yourdomain.com]",
+    phone: "[Phone number, optional]",
+    registration: "[Business registration or tax ID]",
+    governingLaw: "[State / country whose law governs these terms]",
+    shipTime: "[X to Y] business days",
+    returnDays: 30,
+    updated: "[Date]",
+  };
+  const SHIPPING = { flat: 6, freeOver: 75 };
+
   // Pack size is a placeholder until the owner confirms how many cards the pack includes.
   const PACKS = [
     { size: 10, price: 79 },
   ];
   const PRODUCTS = {
-    onyx:   { id: "onyx",   name: "Onyx",          price: 19, kicker: "Matte black, ready to tap", blurb: "Our matte black card, exactly as shown, with nothing to set up at checkout. Link it to your profile when it arrives. To have your name, title or logo engraved on it, choose Customized.", weight: "5 g" },
-    custom: { id: "custom", name: "Customized",    price: 29, kicker: "Onyx, engraved with your details", blurb: "The same matte black Onyx card, laser-engraved with your name, title and logo. Type below and the preview shows what we engrave.", weight: "5 g" },
-    pack:   { id: "pack",   name: "Business Pack", price: PACKS[0].price, kicker: "Matching cards for a team",  blurb: "Matching cards for your whole team with your company logo on every one. Add everyone's name and we print and program each card.", weight: "5 g each" },
+    onyx:   { id: "onyx",   name: "Onyx",          price: 19, kicker: "Matte black, ready to tap", blurb: "Our matte black card, exactly as shown, with nothing to fill in. When it arrives, set the link it opens. To have your name, title or logo engraved on it, choose Customized." },
+    custom: { id: "custom", name: "Customized",    price: 29, kicker: "Onyx, engraved with your details", blurb: "The same matte black Onyx card, laser-engraved with your name, title and logo. Type below and the preview shows what we engrave." },
+    pack:   { id: "pack",   name: "Business Pack", price: PACKS[0].price, kicker: "Matching cards for a team", blurb: "Matching cards for your team with your company name or logo on every one. List everyone's name and each card is made for that person." },
   };
+
+  // Reviews from verified buyers go here, newest first. Never add made-up or paid reviews.
+  // Shape: { product: "onyx" | "custom" | "pack", rating: 1-5, text: "...", name: "First name L.", date: "2026-11-02", verified: true }
+  const REVIEWS = [];
+
   const COLORS = ["#2b47ff", "#0e0f12", "#f4f1ea", "#e8483b", "#1f7a5a", "#f2b630", "#8e6cf0", "#ff8fb1"];
+  const COLOR_NAMES = { "#2b47ff": "Cobalt", "#0e0f12": "Black", "#f4f1ea": "Ivory", "#e8483b": "Red", "#1f7a5a": "Green", "#f2b630": "Yellow", "#8e6cf0": "Violet", "#ff8fb1": "Pink" };
   const FINISHES = { matte: { label: "Matte", add: 0 }, gloss: { label: "Gloss", add: 0 }, metal: { label: "Metal", add: 10 } };
 
   const money = n => "$" + n.toFixed(2).replace(/\.00$/, "");
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const ph = s => /^\[.*\]/.test(s) ? `<span class="ph">${esc(s)}</span>` : esc(s);
   const WAVE = '<svg class="c-wave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8.5a6 6 0 0 1 0 7"/><path d="M10 6a10 10 0 0 1 0 12"/><path d="M14 3.5a14 14 0 0 1 0 17"/></svg>';
   const ARROW = '<span class="arrow" aria-hidden="true">&rarr;</span>';
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+  const SHIP_TEXT = `Shipping is ${money(SHIPPING.flat)}, or free on orders of ${money(SHIPPING.freeOver)} or more. There are no other fees. If sales tax applies, it is shown before you pay.`;
 
   function inkFor(hex) {
     const n = parseInt(hex.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
@@ -374,19 +470,19 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     return "#" + f(n >> 16 & 255) + f(n >> 8 & 255) + f(n & 255);
   };
 
-  let cart = [];
-  try { cart = JSON.parse(localStorage.getItem("handshake-cart") || "[]").filter(l => PRODUCTS[l.id]); } catch (e) { cart = []; }
-  const save = () => {
-    try { localStorage.setItem("handshake-cart", JSON.stringify(cart)); }
-    catch (e) { try { localStorage.setItem("handshake-cart", JSON.stringify(cart.map(l => ({ ...l, logo: null })))); } catch (e2) {} }
+  // Browser storage holds only the cart and the cookie notice setting. Nothing is sent anywhere.
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
   };
+  let cart = store.get("handshake-cart", []);
+  if (!Array.isArray(cart)) cart = [];
+  cart = cart.filter(l => PRODUCTS[l.id]);
+  const save = () => { if (!store.set("handshake-cart", cart)) store.set("handshake-cart", cart.map(l => ({ ...l, card: { ...l.card, logo: null } }))); };
 
-  const draft = {
-    name: "Alex Rivera", role: "Product Designer",
-    color: "#2b47ff", finish: "gloss", logo: null, logoName: "",
-    company: "Northwind Studio", packSize: 10,
-    team: "Alex Rivera\nSam Okafor\nPriya Shah\nJordan Lee",
-  };
+  // Fields start empty: the preview shows sample text until the customer types their own.
+  const SAMPLE = { name: "Your name", role: "Your title", company: "Company name" };
+  const draft = { name: "", role: "", color: "#2b47ff", finish: "matte", logo: null, logoName: "", company: "", packSize: PACKS[0].size, team: "" };
 
   // Card markup. o: { kind, name, role, color, finish, logo, company, back }
   function card(o) {
@@ -394,14 +490,17 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (o.kind === "onyx") cls += " onyx plain";
     else if (o.kind === "engraved") cls += " onyx engraved";
     else {
-      cls += " f-" + (o.finish || "gloss");
+      cls += " f-" + (o.finish || "matte");
       const c = o.color || "#2b47ff";
       style = `--c-bg:linear-gradient(150deg, ${shade(c, 18)}, ${c} 55%, ${shade(c, -22)});--c-ink:${inkFor(c)}`;
       if (o.kind === "pack" && o.company) mark = o.company;
     }
+    if (o.back) return `<div class="${cls} card-back" style="${style}" role="img" aria-label="Back of the card: NFC symbol and the words Tap to connect">${WAVE}<span class="c-tap" aria-hidden="true">Tap to connect</span></div>`;
     const brand = o.logo ? `<img class="c-logo" src="${o.logo}" alt="">` : `<span class="c-mark">${esc(mark)}</span>`;
-    if (o.back) return `<div class="${cls} card-back" style="${style}">${WAVE}<span class="c-tap">Tap to connect</span></div>`;
-    return `<div class="${cls}" style="${style}" role="img" aria-label="${o.kind === "onyx" ? "Onyx card preview" : "Card preview for " + esc(o.name)}">
+    const label = o.kind === "onyx"
+      ? "Onyx card: matte black with the Handshake wordmark and an NFC symbol"
+      : `${o.kind === "pack" ? "Business Pack card" : "Engraved Onyx card"} for ${o.name}${o.role ? ", " + o.role : ""}${o.logo ? ", with your logo" : ""}`;
+    return `<div class="${cls}" style="${style}" role="img" aria-label="${esc(label)}">
       <div class="c-top">${brand}${WAVE}</div>
       <div class="c-body">${o.kind === "onyx" ? `<div class="c-role">Tap to connect</div>` : `<div class="c-name">${esc(o.name)}</div><div class="c-role">${esc(o.role)}</div>`}</div>
     </div>`;
@@ -409,35 +508,66 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function stack(o, vt) {
     const c = o.color || "#2b47ff";
     const bg = `linear-gradient(150deg, ${shade(c, 18)}, ${c} 55%, ${shade(c, -22)})`;
-    return `<div class="stack"${vt ? ` style="view-transition-name:${vt}"` : ""}><span class="ghost-card g2" style="--c-bg:${bg}"></span><span class="ghost-card g1" style="--c-bg:${bg}"></span>${card(o)}</div>`;
+    return `<div class="stack"${vt ? ` style="view-transition-name:${vt}"` : ""}><span class="ghost-card g2" style="--c-bg:${bg}" aria-hidden="true"></span><span class="ghost-card g1" style="--c-bg:${bg}" aria-hidden="true"></span>${card(o)}</div>`;
   }
-  const packCard = () => ({ kind: "pack", name: teamNames()[0] || "Team member", role: draft.company, color: draft.color, finish: draft.finish, logo: draft.logo, company: draft.company });
-  const customCard = () => ({ kind: "engraved", name: draft.name, role: draft.role, logo: draft.logo });
-  const onyxCard = () => ({ kind: "onyx" });
   const teamNames = () => draft.team.split("\n").map(s => s.trim()).filter(Boolean);
+  const packCard = () => ({ kind: "pack", name: teamNames()[0] || "Team member", role: draft.company || SAMPLE.company, color: draft.color, finish: draft.finish, logo: draft.logo, company: draft.company || SAMPLE.company });
+  const customCard = () => ({ kind: "engraved", name: draft.name || SAMPLE.name, role: draft.role || SAMPLE.role, logo: draft.logo });
+  const onyxCard = () => ({ kind: "onyx" });
   const wrapVT = (html, vt) => `<div style="view-transition-name:${vt};width:100%;display:grid;place-items:center">${html}</div>`;
 
   function tiles(withVT) {
     const vt = id => withVT ? "card-" + id : null;
-    const t = (id, shot, extra = "") => {
+    const t = (id, shot) => {
       const p = PRODUCTS[id];
-      const price = id === "pack" ? `<span class="price">${money(PACKS[0].price)}</span>` : `<span class="price">${money(p.price)}</span>`;
-      return `<a class="tile" href="#card-${id}">${extra}
+      return `<a class="tile" href="#card-${id}">
         <div class="shot s-${id}">${shot}</div>
         <div class="body">
-          <div class="meta"><h3>${p.name}</h3>${price}</div>
+          <div class="meta"><h3>${p.name}</h3><span class="price">${money(p.price)}</span></div>
           <p>${p.kicker}.</p>
           <span class="go">View ${p.name} ${ARROW}</span>
         </div></a>`;
     };
     const onyx = card(onyxCard());
-    const custom = card({ kind: "engraved", name: draft.name, role: draft.role });
+    const custom = card({ kind: "engraved", name: SAMPLE.name, role: SAMPLE.role });
     return `<div class="tiers">
-      ${t("onyx", withVT ? wrapVT(onyx, vt("onyx")) : onyx, `<span class="badge">Most popular</span>`)}
+      ${t("onyx", withVT ? wrapVT(onyx, vt("onyx")) : onyx)}
       ${t("custom", withVT ? wrapVT(custom, vt("custom")) : custom)}
-      ${t("pack", stack({ kind: "pack", name: "Sam Okafor", role: "Northwind Studio", color: "#1f2a44", finish: "matte", company: "Northwind Studio" }, vt("pack")))}
+      ${t("pack", stack({ kind: "pack", name: "Team member", role: SAMPLE.company, color: "#1f2a44", finish: "matte", company: SAMPLE.company }, vt("pack")))}
     </div>`;
   }
+
+  function reviews(productId) {
+    const list = REVIEWS.filter(r => r.verified && (!productId || r.product === productId));
+    const head = `<div class="section-head"><span class="label">Reviews</span><h2>${productId ? "Reviews" : "What customers say"}</h2></div>`;
+    if (!list.length) return `${head}
+      <div class="reviews-empty">
+        <h3>No reviews yet</h3>
+        <p>Handshake is new, so there are no reviews to show. Reviews from customers who bought a card will appear here, good and bad.</p>
+      </div>`;
+    const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
+    return `${head}<p style="margin:-24px 0 24px;color:var(--muted)">${avg.toFixed(1)} out of 5 from ${list.length} verified ${list.length === 1 ? "buyer" : "buyers"}</p>
+      <div class="review-list">${list.map(r => `
+        <article class="review">
+          <span class="stars" aria-label="${r.rating} out of 5 stars">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</span>
+          <p>${esc(r.text)}</p>
+          <footer>${esc(r.name)} · ${PRODUCTS[r.product].name} · Verified buyer · <time datetime="${esc(r.date)}">${esc(r.date)}</time></footer>
+        </article>`).join("")}</div>`;
+  }
+
+  const LEGAL = [["privacy", "Privacy policy"], ["terms", "Terms and conditions"], ["refunds", "Refund policy"], ["cookies", "Cookie policy"], ["business", "Business details"], ["credits", "Font licenses"]];
+  function legalPage(id, title, body) {
+    return `
+      <section class="wrap page-head"><span class="label">Last updated ${ph(BUSINESS.updated)}</span><h1>${title}</h1></section>
+      <section class="wrap legal">
+        <nav aria-label="Policies">${LEGAL.map(([k, t]) => `<a href="#${k}"${k === id ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
+        <article class="prose">
+          ${id === "credits" || id === "business" ? "" : `<p class="draft">Draft text. Fill in the highlighted details and have a lawyer review this page before you take real orders.</p>`}
+          ${body}
+        </article>
+      </section>`;
+  }
+  const contactLine = () => `${ph(BUSINESS.legalName)}, ${ph(BUSINESS.address)}. Email: ${ph(BUSINESS.email)}.`;
 
   const views = {
     home() {
@@ -447,23 +577,23 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <div>
             <span class="label"><span class="dot"></span>NFC business cards</span>
             <h1>Meet once.<br><span class="soft">Stay</span> connected.</h1>
-            <p class="lede">Tap a Handshake card on any phone and your contact details, socials and portfolio open right away. They don't need an app, and you can change your details without reprinting.</p>
+            <p class="lede">Tap a Handshake card on a phone and the link on the card opens, like your contact card, website or social profile. The other person doesn't need an app.</p>
             <div class="actions">
               <a class="btn primary" href="#shop">Shop cards ${ARROW}</a>
               <a class="btn on-night" href="#card-custom">Engrave yours</a>
             </div>
-            <div class="fine">
-              <span>${CHECK}No app needed</span>
-              <span>${CHECK}iPhone and Android</span>
-              <span>${CHECK}Ships in 3 to 5 days</span>
-            </div>
+            <ul class="fine" style="list-style:none;padding:0">
+              <li><span>${CHECK}No app needed</span></li>
+              <li><span>${CHECK}Works with most NFC phones</span></li>
+              <li><span>${CHECK}Free shipping from ${money(SHIPPING.freeOver)}</span></li>
+            </ul>
           </div>
           <div class="stage" aria-hidden="true">
             <div class="rings"><span></span><span></span><span></span></div>
             <div class="float" style="view-transition-name:card-custom">${card(customCard())}</div>
             <div class="shadow"></div>
-            <div class="tag-float t1"><span class="ico">+</span><div><b>Contact saved</b><small>Alex Rivera, just now</small></div></div>
-            <div class="tag-float t2"><span class="ico">in</span><div><b>Profile opened</b><small>No app required</small></div></div>
+            <div class="tag-float t1"><span class="ico">+</span><div><b>Save contact</b><small>Example of what opens</small></div></div>
+            <div class="tag-float t2"><span class="ico">in</span><div><b>Opens in the browser</b><small>No app needed</small></div></div>
           </div>
         </div>
       </section>
@@ -476,30 +606,33 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         ${tiles(false)}
       </section>
 
-      <section class="wrap section">
-        <div class="section-head"><span class="label">How it works</span><h2>From box to first tap in minutes.</h2></div>
+      <section class="wrap section" style="padding-top:0">
+        <div class="section-head"><span class="label">How it works</span><h2>From box to first tap.</h2></div>
         <div class="steps">
           <div class="step"><span class="n">Step 1</span><h3>Choose your card</h3><p>Take Onyx as it comes, get it engraved with your name and logo as Customized, or order a Business Pack for your team.</p></div>
-          <div class="step"><span class="n">Step 2</span><h3>Set up your profile</h3><p>When your card arrives, link it to a profile page with your contact details, socials and files.</p></div>
-          <div class="step"><span class="n">Step 3</span><h3>Tap to share</h3><p>Hold the card near the top of any NFC phone and your profile opens in their browser.</p></div>
+          <div class="step"><span class="n">Step 2</span><h3>Set your link</h3><p>When your card arrives, choose what it opens: your contact card, website, portfolio or social profile.</p></div>
+          <div class="step"><span class="n">Step 3</span><h3>Tap to share</h3><p>Hold the card near the top of a phone with NFC turned on, and the link opens in its browser.</p></div>
         </div>
       </section>
+
+      <section class="wrap" style="padding-bottom:clamp(64px,9vw,112px)">${reviews()}</section>
 
       <section class="wrap" style="padding-bottom:clamp(64px,9vw,112px)">
         <div class="faq">
           <div class="section-head" style="margin:0"><span class="label">Questions</span><h2>Good to know.</h2></div>
           <div>
-            <details open><summary>Does the other person need an app?</summary><p>No. iPhones (XS and newer) and most Android phones read NFC on their own. Your profile opens in their web browser.</p></details>
+            <details open><summary>Does the other person need an app?</summary><p>No. Most iPhones from the iPhone XS onward, and most Android phones with NFC turned on, read the card without an app. The link opens in their browser. Phones without NFC can't read the card.</p></details>
             <details><summary>What is the difference between Onyx and Customized?</summary><p>They are the same matte black card. Onyx comes blank, and Customized is laser-engraved with your name, title and logo.</p></details>
-            <details><summary>Can I change my details after it's printed?</summary><p>Yes. The card links to your profile, so when you update the profile, every tap shows the new version.</p></details>
-                        <details><summary>How does the Business Pack work?</summary><p>You get ${PACKS[0].size} matching cards. Upload your logo and list your team's names. We print and program a card for each person.</p></details>
+            <details><summary>How does the Business Pack work?</summary><p>You get ${PACKS[0].size} matching cards. Add your company name or logo and list your team's names, and each card is made for that person.</p></details>
+            <details><summary>What does shipping cost?</summary><p>${SHIP_TEXT} Orders ship in ${ph(BUSINESS.shipTime)}.</p></details>
+            <details><summary>Can I return a card?</summary><p>Onyx cards can be returned unused within ${BUSINESS.returnDays} days. Engraved cards are made for you, so they can only be returned if they arrive damaged or with a mistake we made. See the <a href="#refunds">refund policy</a>.</p></details>
           </div>
         </div>
       </section>
 
       <section class="wrap" style="padding-bottom:clamp(64px,9vw,112px)">
         <div class="cta">
-          <div><h2>Your next intro starts with a tap.</h2><p>Onyx starts at ${money(PRODUCTS.onyx.price)}, and shipping is free on orders over $75.</p></div>
+          <div><h2>Your next intro starts with a tap.</h2><p>Onyx is ${money(PRODUCTS.onyx.price)}, and shipping is free on orders of ${money(SHIPPING.freeOver)} or more.</p></div>
           <a class="btn primary" href="#shop">Shop cards ${ARROW}</a>
         </div>
       </section>`;
@@ -508,20 +641,20 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     shop() {
       const y = t => `<td class="yes">${t}</td>`, n = t => `<td class="no">${t}</td>`;
       return `
-      <section class="wrap page-head"><span class="label">3 cards</span><h1>Shop cards</h1><p>Every card has an NFC chip and comes with a free profile page you can edit any time.</p></section>
+      <section class="wrap page-head"><span class="label">3 cards</span><h1>Shop cards</h1><p>Every card has an NFC chip that opens a link you choose when someone taps it with their phone.</p></section>
       <section class="wrap" style="padding-bottom:96px">
         ${tiles(true)}
         <div class="compare">
           <table>
-            <thead><tr><th scope="col"><span class="label">Compare</span></th><th scope="col">Onyx</th><th scope="col">Customized</th><th scope="col">Business Pack</th></tr></thead>
+            <caption class="sr-only">Comparison of Onyx, Customized and Business Pack</caption>
+            <thead><tr><td></td><th scope="col">Onyx</th><th scope="col">Customized</th><th scope="col">Business Pack</th></tr></thead>
             <tbody>
               <tr><th scope="row">Price</th>${y(money(PRODUCTS.onyx.price))}${y(money(PRODUCTS.custom.price))}${y(money(PACKS[0].price))}</tr>
               <tr><th scope="row">Cards</th>${y("1")}${y("1")}${y(String(PACKS[0].size))}</tr>
-              <tr><th scope="row">Card color</th>${y("Matte black")}${y("Matte black (Onyx)")}${y("Any color")}</tr>
-              <tr><th scope="row">Engraving</th>${n("None")}${y("Name, title and logo")}${y("Name and company logo")}</tr>
-              <tr><th scope="row">Your logo</th>${n("No")}${y("Yes, engraved")}${y("Yes, on every card")}</tr>
-              <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte")}${y("Matte, gloss or metal")}</tr>
-              <tr><th scope="row">Names printed</th>${n("None")}${y("Yours")}${y("One per team member")}</tr>
+              <tr><th scope="row">Card color</th>${y("Matte black")}${y("Matte black (Onyx)")}${y("Your choice")}</tr>
+              <tr><th scope="row">Engraving</th>${n("None")}${y("Name, title and logo")}${y("Names and company logo")}</tr>
+              <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte")}${y("Matte, gloss, or metal for " + money(FINISHES.metal.add) + " more")}</tr>
+              <tr><th scope="row">Shipping</th><td colspan="3">${money(SHIPPING.flat)}, or free on orders of ${money(SHIPPING.freeOver)} or more</td></tr>
             </tbody>
           </table>
         </div>
@@ -530,15 +663,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
     product(id) {
       const p = PRODUCTS[id]; if (!p) return views.shop();
-      let preview, fields, priceHtml, facts;
+      let preview, fields, priceHtml;
       if (id === "onyx") {
         preview = card(onyxCard());
         priceHtml = `<span class="price-lg" id="price">${money(p.price)}</span>`;
         fields = "";
       } else if (id === "custom") {
         preview = card(customCard());
-        priceHtml = `<span class="price-lg" id="price">${money(customPrice())}</span>`;
-        fields = nameFields() + logoField("Engraved in the top-left corner. Use a PNG or SVG with a transparent background.");
+        priceHtml = `<span class="price-lg" id="price">${money(p.price)}</span>`;
+        fields = nameFields() + logoField("Engraved in the top-left corner. A PNG or SVG with a transparent background works best.");
       } else {
         preview = stack(packCard());
         priceHtml = `<span class="price-lg"><span id="price">${money(packPrice())}</span><small id="per">${perCard()}</small></span>`;
@@ -546,27 +679,22 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           ${PACKS.length < 2 ? "" : `<div class="field"><span class="flabel">Pack size</span>
             <div class="seg" id="packSeg">${PACKS.map(k => `<button type="button" data-size="${k.size}" aria-pressed="${k.size === draft.packSize}">${k.size} cards<small>${money(k.price)}</small></button>`).join("")}</div>
           </div>`}
-          <div class="field"><label for="f-company">Company name</label><input type="text" id="f-company" maxlength="30" value="${esc(draft.company)}"></div>
-          <div class="field"><label for="f-team">Team names <span id="teamCount"></span></label><textarea id="f-team" rows="5">${esc(draft.team)}</textarea></div>
+          <div class="field"><label for="f-company">Company name</label><input type="text" id="f-company" maxlength="30" autocomplete="organization" placeholder="${SAMPLE.company}" value="${esc(draft.company)}" aria-describedby="err-company"><span class="err" id="err-company" aria-live="polite"></span></div>
+          <div class="field"><label for="f-team">Team names, one per line <span id="teamCount"></span></label><textarea id="f-team" rows="5" placeholder="One name per line" aria-describedby="teamCount err-team">${esc(draft.team)}</textarea><span class="err" id="err-team" aria-live="polite"></span></div>
           ${colorField()}${finishField()}${logoField("Printed on every card in the pack.")}`;
       }
-      facts = `<dl class="facts">
-        <div><dt>Size</dt><dd>85.6 × 54 mm (ISO ID-1)</dd></div>
-        <div><dt>Weight</dt><dd>${p.weight}</dd></div>
-        <div><dt>Ships in</dt><dd>3 to 5 business days</dd></div>
-      </dl>`;
       const backO = id === "onyx" ? onyxCard() : id === "custom" ? customCard() : packCard();
       return `
-      <div class="wrap crumbs"><a href="#shop">Shop</a><span aria-hidden="true">/</span><span>${p.name}</span></div>
+      <nav class="wrap crumbs" aria-label="Breadcrumb"><a href="#shop">Shop</a><span aria-hidden="true">/</span><span aria-current="page">${p.name}</span></nav>
       <section class="wrap pdp">
-        <div class="viewer v-${id}" id="viewer" style="--pick:${draft.color}">
+        <div class="viewer v-${id}" id="viewer">
           <div class="tilt" id="tilt">
             <div class="flip" id="flip" style="view-transition-name:card-${id}">
               <div class="face front" id="front">${preview}</div>
-              <div class="face back" id="back">${card({ ...backO, back: true })}</div>
+              <div class="face back" id="back" aria-hidden="true">${card({ ...backO, back: true })}</div>
             </div>
           </div>
-          <div class="tools"><button type="button" class="chip-btn" id="flipBtn">Show back</button></div>
+          <div class="tools"><button type="button" class="chip-btn" id="flipBtn" aria-pressed="false">Show back</button></div>
         </div>
         <div class="buy">
           <span class="label">${p.kicker}</span>
@@ -575,12 +703,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <p class="desc">${p.blurb}</p>
           ${fields}
           <div class="buy-row">
-            ${id === "pack" ? "" : `<div class="qty"><button type="button" id="q-dec" aria-label="Decrease quantity">&minus;</button><output id="q-val">1</output><button type="button" id="q-inc" aria-label="Increase quantity">+</button></div>`}
+            ${id === "pack" ? "" : `<div class="qty" role="group" aria-label="Quantity"><button type="button" id="q-dec" aria-label="Decrease quantity">&minus;</button><output id="q-val" aria-live="polite">1</output><button type="button" id="q-inc" aria-label="Increase quantity">+</button></div>`}
             <button class="btn primary" id="add" type="button">Add to cart</button>
           </div>
-          ${facts}
+          <p class="ship-note">${SHIP_TEXT}</p>
+          <dl class="facts">
+            <div><dt>Size</dt><dd>85.6 × 54 mm, standard card size</dd></div>
+            <div><dt>Ships in</dt><dd>${ph(BUSINESS.shipTime)}</dd></div>
+            <div><dt>Returns</dt><dd>${id === "onyx" ? `Unused, within ${BUSINESS.returnDays} days` : "Only if damaged or made wrong"}</dd></div>
+          </dl>
         </div>
-      </section>`;
+      </section>
+      <section class="wrap" style="padding-bottom:96px">${reviews(id)}</section>`;
     },
 
     cart() {
@@ -588,63 +722,203 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <section class="wrap page-head"><h1>Cart</h1></section>
         <section class="wrap empty"><p>Your cart is empty. Pick a card to get started.</p><a class="btn primary" href="#shop">Shop cards ${ARROW}</a></section>`;
       const sub = cart.reduce((s, l) => s + l.unit * l.qty, 0);
-      const FREE = 75, ship = sub >= FREE ? 0 : 6;
+      const ship = sub >= SHIPPING.freeOver ? 0 : SHIPPING.flat;
       return `
       <section class="wrap page-head"><span class="label">${cart.reduce((s, l) => s + l.qty, 0)} items</span><h1>Cart</h1></section>
       <section class="wrap cart">
-        <div>
+        <div role="list" aria-label="Items in your cart">
           ${cart.map((l, i) => {
             const vis = l.id === "pack" ? stack(l.card) : card(l.card);
+            const nm = PRODUCTS[l.id].name;
             return `
-            <div class="line">
+            <div class="line" role="listitem">
               ${vis}
-              <div><h3>${PRODUCTS[l.id].name}</h3><div class="sub">${esc(l.desc)}</div></div>
+              <div><h2 style="font-size:20px;font-weight:600">${nm}</h2><div class="sub">${esc(l.desc)}</div></div>
               <div class="right">
                 <span class="amt">${money(l.unit * l.qty)}</span>
-                <div class="qty"><button type="button" data-dec="${i}" aria-label="Decrease">&minus;</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="Increase">+</button></div>
-                <button class="link-btn" type="button" data-rm="${i}">Remove</button>
+                <div class="qty" role="group" aria-label="Quantity of ${nm}"><button type="button" data-dec="${i}" aria-label="Decrease quantity of ${nm}">&minus;</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="Increase quantity of ${nm}">+</button></div>
+                <button class="link-btn" type="button" data-rm="${i}">Remove<span class="sr-only"> ${nm}</span></button>
               </div>
             </div>`; }).join("")}
         </div>
-        <aside class="summary">
-          <h3>Order summary</h3>
+        <aside class="summary" aria-labelledby="sum-title">
+          <h2 id="sum-title" style="font-size:22px;font-weight:600;margin-bottom:14px">Order summary</h2>
           <div class="row"><span>Subtotal</span><span>${money(sub)}</span></div>
           <div class="row"><span>Shipping</span><span>${ship ? money(ship) : "Free"}</span></div>
-          <div class="meter" aria-hidden="true"><i style="width:${Math.min(100, sub / FREE * 100)}%"></i></div>
-          <div class="row total"><span>Total</span><span>${money(sub + ship)}</span></div>
-          <button class="btn primary full" type="button" id="checkout" style="margin-top:18px">Checkout ${ARROW}</button>
-          <p class="note">${ship ? `Add ${money(FREE - sub)} more for free shipping.` : "Your order ships free."} Checkout is a demo and no payment is taken.</p>
+          <div class="row"><span>Sales tax</span><span>Shown before you pay</span></div>
+          <div class="row total"><span>Total before tax</span><span>${money(sub + ship)}</span></div>
+          <form id="checkoutForm" novalidate>
+            <label class="check" for="c-terms"><input type="checkbox" id="c-terms" required aria-describedby="err-terms"><span>I agree to the <a href="#terms">terms and conditions</a> and have read the <a href="#privacy">privacy policy</a> and <a href="#refunds">refund policy</a>.</span></label>
+            <span class="err" id="err-terms" aria-live="polite" style="display:block;color:var(--danger);font-size:13px;margin-top:6px"></span>
+            <label class="check" for="c-news"><input type="checkbox" id="c-news"><span>Email me about new cards and offers. <small>Optional. You can unsubscribe from any email.</small></span></label>
+            <button class="btn primary full" type="submit" id="checkout" style="margin-top:18px">Checkout ${ARROW}</button>
+          </form>
+          <p class="note">${ship ? `Orders of ${money(SHIPPING.freeOver)} or more ship free.` : "Your order ships free."} Checkout is a demo and no payment is taken.</p>
         </aside>
       </section>`;
     },
+
+    privacy() {
+      return legalPage("privacy", "Privacy policy", `
+        <p>This policy explains what personal information ${ph(BUSINESS.legalName)} ("Handshake", "we") collects when you use this site and buy from us, why, and what you can do about it.</p>
+        <h2>Who we are</h2>
+        <p>${contactLine()} Contact us at that address with any privacy question or request.</p>
+        <h2>What we collect</h2>
+        <div class="tbl"><table>
+          <thead><tr><th scope="col">Information</th><th scope="col">Why</th><th scope="col">Legal basis</th></tr></thead>
+          <tbody>
+            <tr><td>Text you type for engraving (names, titles, company name) and any logo you upload</td><td>To make your cards</td><td>Performing our contract with you</td></tr>
+            <tr><td>Name, shipping address and email at checkout</td><td>To ship your order and send order updates</td><td>Performing our contract with you</td></tr>
+            <tr><td>Payment details</td><td>To take payment. These go straight to our payment provider; we don't see or store your full card number.</td><td>Performing our contract with you</td></tr>
+            <tr><td>Your email, only if you tick the marketing box</td><td>To send news and offers</td><td>Your consent, which you can withdraw at any time</td></tr>
+            <tr><td>Messages you send us</td><td>To answer you</td><td>Our legitimate interest in helping customers</td></tr>
+          </tbody>
+        </table></div>
+        <p>We don't use analytics, advertising or tracking tools, and we don't collect information we don't need. While you shop, your cart is kept only in your own browser (see the <a href="#cookies">cookie policy</a>).</p>
+        <h2>Team members' names</h2>
+        <p>If you order a Business Pack, you give us your colleagues' names to engrave. Only send names you are allowed to share. We use them only to make the cards.</p>
+        <h2>Who we share it with</h2>
+        <p>We share information only with the companies that help us fulfil your order: our payment provider ${ph("[name]")}, our shipping carrier ${ph("[name]")}, our email provider ${ph("[name]")} and our web host ${ph("[name]")}. We don't sell or rent your personal information.</p>
+        <h2>How long we keep it</h2>
+        <p>We keep order records for ${ph("[X years]")} for tax and accounting. We delete engraving text and logos ${ph("[X days]")} after your order ships. Marketing emails stop as soon as you unsubscribe.</p>
+        <h2>Your rights</h2>
+        <p>Depending on where you live, you can ask us to show, correct, delete or send you a copy of your information, and object to or limit how we use it. Email ${ph(BUSINESS.email)} and we will reply within 30 days. You can also complain to your local data protection authority. California residents: we don't sell or share personal information as defined by the CCPA.</p>
+        <h2>Children</h2>
+        <p>This shop is not meant for children under 16, and we don't knowingly collect their information.</p>
+        <h2>Changes</h2>
+        <p>If we change this policy, we will update the date at the top of this page.</p>`);
+    },
+
+    terms() {
+      return legalPage("terms", "Terms and conditions", `
+        <p>These terms apply when you buy from ${ph(BUSINESS.legalName)} ("Handshake", "we") through this site. By placing an order you agree to them.</p>
+        <h2>Products and prices</h2>
+        <p>Prices are in US dollars. The price you see is the price you pay for the product. Shipping is shown before checkout: ${money(SHIPPING.flat)}, or free on orders of ${money(SHIPPING.freeOver)} or more. If sales tax applies, it is shown before you pay. There are no other fees.</p>
+        <h2>Orders</h2>
+        <p>Your order is accepted when we email you a confirmation. We may cancel an order and refund you in full if a product is unavailable or a price was clearly wrong.</p>
+        <h2>Your engraving and logos</h2>
+        <p>Check your spelling before ordering: we engrave what you type. By uploading a logo or entering names, you confirm you have the right to use them. We may refuse engraving that is unlawful, infringes someone else's rights, or is offensive.</p>
+        <h2>How the cards work</h2>
+        <p>Cards work with phones that support NFC and have it turned on. We can't guarantee every phone will read every card. You are responsible for the link your card opens and the content on it.</p>
+        <h2>Shipping</h2>
+        <p>Orders ship in ${ph(BUSINESS.shipTime)}. Delivery times after that depend on the carrier. Tell us within 14 days if your order doesn't arrive.</p>
+        <h2>Returns and refunds</h2>
+        <p>See our <a href="#refunds">refund policy</a>. Nothing in these terms limits rights you have under consumer law.</p>
+        <h2>Liability</h2>
+        <p>To the extent the law allows, our total liability for an order is limited to the amount you paid for it. We are not liable for losses we could not reasonably foresee.</p>
+        <h2>Governing law</h2>
+        <p>These terms are governed by the laws of ${ph(BUSINESS.governingLaw)}.</p>
+        <h2>Contact</h2>
+        <p>${contactLine()}</p>`);
+    },
+
+    refunds() {
+      return legalPage("refunds", "Refund policy", `
+        <h2>Onyx (blank cards)</h2>
+        <p>You can return unused Onyx cards within ${BUSINESS.returnDays} days of delivery for a full refund of the product price. Email ${ph(BUSINESS.email)} to start a return. ${ph("[Who pays return shipping]")}.</p>
+        <h2>Customized and Business Pack (engraved cards)</h2>
+        <p>These are made to your order, so we can't take them back if you change your mind. We will replace them or refund you in full if they arrive damaged, don't work, or have a mistake we made. Email us within 30 days of delivery with a photo.</p>
+        <h2>Cards that stop working</h2>
+        <p>If a card stops working under normal use within ${ph("[X months]")}, we will replace it free.</p>
+        <h2>How refunds are paid</h2>
+        <p>Refunds go back to your original payment method within 10 business days of approval. We refund the original shipping cost when the return is due to our mistake.</p>
+        <h2>Your legal rights</h2>
+        <p>This policy doesn't affect your rights under consumer law, including any right to cancel that applies where you live.</p>`);
+    },
+
+    cookies() {
+      return legalPage("cookies", "Cookie policy", `
+        <p>This site doesn't use cookies for analytics, advertising or tracking. It keeps two small items in your browser's local storage so the shop works:</p>
+        <div class="tbl"><table>
+          <thead><tr><th scope="col">Name</th><th scope="col">What it does</th><th scope="col">How long</th></tr></thead>
+          <tbody>
+            <tr><td><code>handshake-cart</code></td><td>Remembers what's in your cart, including engraving text and logos, so it's still there when you come back</td><td>Until you empty your cart or clear your browser data</td></tr>
+            <tr><td><code>handshake-cookie-notice</code></td><td>Remembers that you closed the cookie notice</td><td>Until you clear your browser data</td></tr>
+          </tbody>
+        </table></div>
+        <p>Both are needed for features you ask for, so they don't require consent. They stay on your device and are never sent to us or anyone else.</p>
+        <p>Fonts are hosted on this site, so no requests go to font services. This site loads no third-party scripts.</p>
+        <p>If we ever add optional cookies, such as analytics, we will ask for your consent first and you will be able to say no just as easily.</p>
+        <p><button type="button" class="btn ghost" id="clearData">Clear my cart and settings from this browser</button></p>`);
+    },
+
+    business() {
+      return legalPage("business", "Business details", `
+        <div class="tbl"><table><tbody>
+          <tr><th scope="row">Business name</th><td>${ph(BUSINESS.legalName)}</td></tr>
+          <tr><th scope="row">Address</th><td>${ph(BUSINESS.address)}</td></tr>
+          <tr><th scope="row">Email</th><td>${ph(BUSINESS.email)}</td></tr>
+          <tr><th scope="row">Phone</th><td>${ph(BUSINESS.phone)}</td></tr>
+          <tr><th scope="row">Registration</th><td>${ph(BUSINESS.registration)}</td></tr>
+        </tbody></table></div>`);
+    },
+
+    credits() {
+      return legalPage("credits", "Font licenses", `
+        <p>This site uses three typefaces, all published under the SIL Open Font License 1.1, which allows use on websites. Copies of each license are included with the site's files in the <code>fonts</code> folder.</p>
+        <ul>
+          <li>Bricolage Grotesque, copyright 2022 The Bricolage Grotesque Project Authors</li>
+          <li>Instrument Sans, copyright 2022 The Instrument Sans Project Authors</li>
+          <li>JetBrains Mono, copyright 2020 The JetBrains Mono Project Authors</li>
+        </ul>`);
+    },
   };
+
+  function footer() {
+    return `
+      <div class="cols">
+        <div>
+          <h2>Handshake</h2>
+          <address>
+            <span>${ph(BUSINESS.legalName)}</span>
+            <span>${ph(BUSINESS.address)}</span>
+            <span>${ph(BUSINESS.email)}</span>
+          </address>
+        </div>
+        <div>
+          <h2>Policies</h2>
+          <ul>${LEGAL.slice(0, 4).map(([k, t]) => `<li><a href="#${k}">${t}</a></li>`).join("")}</ul>
+        </div>
+        <div>
+          <h2>More</h2>
+          <ul>
+            <li><a href="#business">Business details</a></li>
+            <li><a href="#credits">Font licenses</a></li>
+            <li><button type="button" class="link-btn" id="cookieSettings">Cookie notice</button></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fine-print">
+        <span>Demo storefront. No real orders are placed and no payment is taken.</span>
+        <span>Works with most phones that have NFC turned on.</span>
+      </div>`;
+  }
 
   function nameFields() {
     return `<div class="two">
-      <div class="field"><label for="f-name">Name on card</label><input type="text" id="f-name" maxlength="28" value="${esc(draft.name)}"></div>
-      <div class="field"><label for="f-role">Title</label><input type="text" id="f-role" maxlength="32" value="${esc(draft.role)}"></div>
+      <div class="field"><label for="f-name">Name on card</label><input type="text" id="f-name" maxlength="28" autocomplete="name" placeholder="${SAMPLE.name}" value="${esc(draft.name)}" aria-describedby="err-name"><span class="err" id="err-name" aria-live="polite"></span></div>
+      <div class="field"><label for="f-role">Title <span>Optional</span></label><input type="text" id="f-role" maxlength="32" autocomplete="organization-title" placeholder="${SAMPLE.role}" value="${esc(draft.role)}"></div>
     </div>`;
   }
   function colorField() {
-    return `<div class="field"><span class="flabel">Card color <span id="colorHex">${draft.color.toUpperCase()}</span></span>
+    return `<fieldset class="field" style="border:0;padding:0;margin:0 0 22px"><legend class="flabel" style="padding:0;margin-bottom:10px;width:100%">Card color <span id="colorHex">${esc(COLOR_NAMES[draft.color] || draft.color.toUpperCase())}</span></legend>
       <div class="swatches" id="swatches">
-        ${COLORS.map(c => `<button type="button" class="swatch" style="--sw:${c}" data-color="${c}" aria-label="Color ${c}" aria-pressed="${c === draft.color}"></button>`).join("")}
-        <span class="swatch picker" title="Pick any color"><input type="color" id="f-color" value="${draft.color}" aria-label="Pick any color"></span>
-      </div></div>`;
+        ${COLORS.map(c => `<button type="button" class="swatch" style="--sw:${c}" data-color="${c}" aria-label="${COLOR_NAMES[c]}" aria-pressed="${c === draft.color}"></button>`).join("")}
+        <span class="swatch picker"><input type="color" id="f-color" value="${draft.color}" aria-label="Choose any other color"></span>
+      </div></fieldset>`;
   }
   function finishField() {
-    return `<div class="field"><span class="flabel">Finish</span>
-      <div class="seg" id="finishSeg">${Object.entries(FINISHES).map(([k, f]) => `<button type="button" data-finish="${k}" aria-pressed="${k === draft.finish}">${f.label}<small>${f.add ? "+" + money(f.add) : "Included"}</small></button>`).join("")}</div></div>`;
+    return `<fieldset class="field" style="border:0;padding:0;margin:0 0 22px"><legend class="flabel" style="padding:0;margin-bottom:10px">Finish</legend>
+      <div class="seg" id="finishSeg">${Object.entries(FINISHES).map(([k, f]) => `<button type="button" data-finish="${k}" aria-pressed="${k === draft.finish}">${f.label}<small>${f.add ? "+" + money(f.add) : "No extra cost"}</small></button>`).join("")}</div></fieldset>`;
   }
   function logoField(help) {
     return `<div class="field"><span class="flabel">Logo <span>Optional</span></span>
       <div class="upload" id="drop">
-        <div class="thumb" id="thumb">${draft.logo ? `<img src="${draft.logo}" alt="">` : "+"}</div>
-        <div class="txt"><b id="logoName">${draft.logo ? esc(draft.logoName) : "Upload a logo"}</b><span>${help}</span></div>
-        <label for="f-logo">${draft.logo ? "Replace" : "Choose file"}</label><input type="file" id="f-logo" accept="image/*">
+        <div class="thumb" id="thumb">${draft.logo ? `<img src="${draft.logo}" alt="Your uploaded logo">` : `<span aria-hidden="true">+</span>`}</div>
+        <div class="txt"><b id="logoName">${draft.logo ? esc(draft.logoName) : "Upload a logo"}</b><span id="logoHelp">${help}</span></div>
+        <label for="f-logo">${draft.logo ? "Replace logo" : "Choose file"}</label><input type="file" id="f-logo" accept="image/png,image/jpeg,image/svg+xml,image/webp" aria-describedby="logoHelp">
       </div></div>`;
   }
-  const customPrice = () => PRODUCTS.custom.price;
   const packInfo = () => PACKS.find(k => k.size === draft.packSize) || PACKS[0];
   const packPrice = () => packInfo().price + FINISHES[draft.finish].add;
   const perCard = () => `${money(packPrice() / packInfo().size)} per card`;
@@ -652,6 +926,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const view = document.getElementById("view");
   const countEl = document.getElementById("cartCount");
   const toastEl = document.getElementById("toast");
+  const cookieEl = document.getElementById("cookie");
   const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
   let toastTimer;
 
@@ -661,7 +936,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   }
   function toast(html) {
     toastEl.innerHTML = html; toastEl.classList.add("show");
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2800);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove("show"), 4000);
   }
 
   function parse() {
@@ -674,19 +949,33 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     view.innerHTML = r.name === "product" ? views.product(r.arg) : views[r.name]();
     const active = r.name === "product" ? "shop" : r.name;
     document.querySelectorAll("[data-nav]").forEach(a => a.dataset.nav === active ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+    const h1 = view.querySelector("h1");
+    document.title = (h1 && r.name !== "home" ? h1.textContent + " · " : "") + "Handshake";
     wire(r);
+  }
+  // After navigating, move focus to the new page's heading so keyboard and screen reader users start there.
+  function focusPage() {
+    const h1 = view.querySelector("h1");
+    if (h1) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: true }); }
   }
   let first = true;
   function go() {
     const top = () => window.scrollTo({ top: 0, behavior: "instant" });
     if (first) { first = false; render(); return; }
-    if (document.startViewTransition && !reduced()) document.startViewTransition(() => { render(); top(); }).ready.catch(() => {});
-    else { render(); top(); view.classList.remove("fallback-in"); void view.offsetWidth; view.classList.add("fallback-in"); }
+    if (document.startViewTransition && !reduced()) {
+      const t = document.startViewTransition(() => { render(); top(); });
+      t.ready.catch(() => {});
+      t.updateCallbackDone.then(focusPage, focusPage);
+    } else { render(); top(); focusPage(); view.classList.remove("fallback-in"); void view.offsetWidth; view.classList.add("fallback-in"); }
   }
 
   function wire(r) {
     if (r.name === "product" && PRODUCTS[r.arg]) wireProduct(r.arg);
     if (r.name === "cart") wireCart();
+    if (r.name === "cookies") document.getElementById("clearData").onclick = () => {
+      try { localStorage.removeItem("handshake-cart"); localStorage.removeItem("handshake-cookie-notice"); } catch (e) {}
+      cart = []; updateCount(); toast("Your cart and settings were removed from this browser.");
+    };
   }
 
   function wireProduct(id) {
@@ -702,29 +991,33 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       tilt.style.transform = `rotateY(${x * 20}deg) rotateX(${-y * 16}deg)`;
     });
     viewer.addEventListener("pointerleave", () => { tilt.style.transition = ""; tilt.style.transform = ""; });
-    $("flipBtn").onclick = () => { const f = flip.classList.toggle("flipped"); $("flipBtn").textContent = f ? "Show front" : "Show back"; };
+    $("flipBtn").onclick = () => {
+      const f = flip.classList.toggle("flipped");
+      $("flipBtn").textContent = f ? "Show front" : "Show back";
+      $("flipBtn").setAttribute("aria-pressed", f);
+      front.setAttribute("aria-hidden", f); back.setAttribute("aria-hidden", !f);
+    };
 
     const cardObj = () => id === "onyx" ? onyxCard() : id === "custom" ? customCard() : packCard();
     const refresh = () => {
       const o = cardObj();
       front.innerHTML = id === "pack" ? stack(o) : card(o);
       back.innerHTML = card({ ...o, back: true });
-      viewer.style.setProperty("--pick", draft.color);
-      if ($("price")) $("price").textContent = money(id === "onyx" ? PRODUCTS.onyx.price : id === "custom" ? customPrice() : packPrice());
+      if ($("price") && id === "pack") $("price").textContent = money(packPrice());
       if ($("per")) $("per").textContent = perCard();
       if ($("teamCount")) {
         const n = teamNames().length, s = draft.packSize;
-        $("teamCount").textContent = n > s ? `${n} names, but the pack has ${s} cards` : `${n} of ${s} named${n < s ? ", the rest print blank" : ""}`;
+        $("teamCount").textContent = n > s ? `${n} names for ${s} cards` : `${n} of ${s}${n && n < s ? ", the rest are made without a name" : ""}`;
       }
     };
-    const bind = (elId, key) => { const el = $(elId); if (el) el.addEventListener("input", () => { draft[key] = el.value; refresh(); }); };
+    const bind = (elId, key) => { const el = $(elId); if (el) el.addEventListener("input", () => { draft[key] = el.value; el.removeAttribute("aria-invalid"); refresh(); }); };
     bind("f-name", "name"); bind("f-role", "role"); bind("f-company", "company"); bind("f-team", "team");
 
     const sw = $("swatches");
     const setColor = c => {
       draft.color = c;
       sw.querySelectorAll("[data-color]").forEach(b => b.setAttribute("aria-pressed", b.dataset.color === c));
-      $("colorHex").textContent = c.toUpperCase();
+      $("colorHex").textContent = COLOR_NAMES[c] || c.toUpperCase();
       refresh();
     };
     if (sw) {
@@ -745,14 +1038,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     const drop = $("drop");
     if (drop) {
       const take = file => {
-        if (!file || !file.type.startsWith("image/")) { toast("Choose an image file, such as a PNG, JPG or SVG."); return; }
+        if (!file || !/^image\/(png|jpeg|svg\+xml|webp)$/.test(file.type)) { toast("Choose a PNG, JPG, SVG or WebP image."); return; }
         if (file.size > 2e6) { toast("That logo is over 2 MB. Choose a smaller file."); return; }
         const rd = new FileReader();
         rd.onload = () => {
           draft.logo = rd.result; draft.logoName = file.name;
-          $("thumb").innerHTML = `<img src="${draft.logo}" alt="">`;
+          $("thumb").innerHTML = `<img src="${draft.logo}" alt="Your uploaded logo">`;
           $("logoName").textContent = file.name;
-          drop.querySelector("label").textContent = "Replace";
+          drop.querySelector("label").textContent = "Replace logo";
           refresh();
         };
         rd.readAsDataURL(file);
@@ -768,15 +1061,30 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       $("q-dec").onclick = () => { q = Math.max(1, q - 1); $("q-val").textContent = q; };
       $("q-inc").onclick = () => { q = Math.min(50, q + 1); $("q-val").textContent = q; };
     }
+
+    // Engraved products need real text from the customer, never the sample preview text.
+    const invalid = (fieldId, errId, msg) => { $(fieldId).setAttribute("aria-invalid", "true"); $(errId).textContent = msg; return true; };
+    const validate = () => {
+      ["err-name", "err-company", "err-team"].forEach(e => { if ($(e)) $(e).textContent = ""; });
+      let bad = false, firstBad = null;
+      const mark = (f, e, m) => { bad = invalid(f, e, m); firstBad = firstBad || $(f); };
+      if (id === "custom" && !draft.name.trim()) mark("f-name", "err-name", "Enter the name to engrave.");
+      if (id === "pack" && !draft.company.trim() && !draft.logo) mark("f-company", "err-company", "Enter a company name or upload a logo.");
+      if (id === "pack" && teamNames().length > draft.packSize) mark("f-team", "err-team", `The pack has ${draft.packSize} cards. Remove ${teamNames().length - draft.packSize} names.`);
+      if (firstBad) firstBad.focus();
+      return !bad;
+    };
+
     $("add").onclick = () => {
+      if (!validate()) return;
       const o = cardObj();
       let unit, desc;
       if (id === "onyx") { unit = PRODUCTS.onyx.price; desc = "Matte black, no engraving"; }
-      else if (id === "custom") { unit = customPrice(); desc = `Engraved Onyx · ${draft.name} · ${draft.role}${draft.logo ? " · Logo" : ""}`; }
-      else { unit = packPrice(); q = 1; desc = `${draft.packSize} cards · ${draft.company} · ${teamNames().length} names · ${FINISHES[draft.finish].label}`; }
-      const key = JSON.stringify([id, desc, o.logo || ""]);
+      else if (id === "custom") { unit = PRODUCTS.custom.price; desc = `Engraved Onyx · ${draft.name}${draft.role ? " · " + draft.role : ""}${draft.logo ? " · Logo" : ""}`; }
+      else { unit = packPrice(); q = 1; desc = `${draft.packSize} cards · ${draft.company || "Logo only"} · ${teamNames().length} names · ${COLOR_NAMES[draft.color] || draft.color.toUpperCase()} · ${FINISHES[draft.finish].label}${draft.logo ? " · Logo" : ""}`; }
+      const key = JSON.stringify([id, desc, o.logo || "", draft.team]);
       const hit = cart.find(l => l.key === key);
-      hit ? hit.qty += q : cart.push({ key, id, unit, desc, qty: q, card: o });
+      hit ? hit.qty += q : cart.push({ key, id, unit, desc, qty: q, card: o, team: id === "pack" ? teamNames() : undefined });
       save(); updateCount(true);
       toast(`Added ${id === "pack" ? "Business Pack" : q + " × " + PRODUCTS[id].name} <a href="#cart">View cart</a>`);
     };
@@ -786,15 +1094,33 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function wireCart() {
     view.querySelectorAll("[data-inc],[data-dec],[data-rm]").forEach(b => b.addEventListener("click", () => {
       const i = +(b.dataset.inc ?? b.dataset.dec ?? b.dataset.rm);
+      const sel = b.dataset.inc != null ? `[data-inc="${i}"]` : b.dataset.dec != null ? `[data-dec="${i}"]` : null;
       if (b.dataset.inc != null) cart[i].qty = Math.min(50, cart[i].qty + 1);
       else if (b.dataset.dec != null) cart[i].qty > 1 ? cart[i].qty-- : cart.splice(i, 1);
       else cart.splice(i, 1);
       save(); updateCount();
-      document.startViewTransition && !reduced() ? document.startViewTransition(render).ready.catch(() => {}) : render();
+      const after = () => { const el = sel && view.querySelector(sel); (el || view.querySelector("h1")).focus(); };
+      if (document.startViewTransition && !reduced()) { const t = document.startViewTransition(render); t.ready.catch(() => {}); t.updateCallbackDone.then(after, after); }
+      else { render(); after(); }
     }));
-    const co = document.getElementById("checkout");
-    if (co) co.onclick = () => toast("Checkout is coming soon. This is a demo store.");
+    const form = document.getElementById("checkoutForm");
+    if (form) form.addEventListener("submit", e => {
+      e.preventDefault();
+      const terms = document.getElementById("c-terms"), err = document.getElementById("err-terms");
+      if (!terms.checked) { err.textContent = "Tick the box to agree to the terms before checking out."; terms.setAttribute("aria-invalid", "true"); terms.focus(); return; }
+      err.textContent = ""; terms.removeAttribute("aria-invalid");
+      toast("Checkout is coming soon. This is a demo store and no payment is taken.");
+    });
   }
+
+  // Cookie notice: informational only, since the site sets no optional cookies.
+  function showCookie(show) { cookieEl.hidden = !show; }
+  document.getElementById("cookieOk").onclick = () => { store.set("handshake-cookie-notice", "seen"); showCookie(false); };
+  document.getElementById("footer").innerHTML = footer();
+  document.getElementById("cookieSettings").onclick = () => { showCookie(true); document.getElementById("cookieOk").focus(); };
+  if (store.get("handshake-cookie-notice", null) !== "seen") showCookie(true);
+
+  document.getElementById("skip").onclick = () => { const h1 = view.querySelector("h1"); (h1 || view).setAttribute("tabindex", "-1"); (h1 || view).focus(); };
 
   window.addEventListener("hashchange", go);
   updateCount();
