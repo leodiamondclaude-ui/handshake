@@ -421,6 +421,13 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
 .demo-phone .sheet small { color: #5d6471; font-size: .95em; overflow-wrap: anywhere; }
 .demo-phone .sheet i { display: block; margin-top: 4px; font-style: normal; text-align: center; background: #2b47ff; color: #fff; border-radius: 99px; padding: 5px 4px; font-weight: 600; }
 .demo-phone .av { width: 2.6em; height: 2.6em; border-radius: 50%; background: #101217; color: #fff; display: grid; place-items: center; font-weight: 700; margin-bottom: 2px; }
+.demo-phone .sheet:has(.notes) { position: absolute; inset: 13% 6% auto; background: none; box-shadow: none; padding: 0; }
+.demo-phone .notes { display: grid; gap: 5px; }
+.demo-phone .note { background: #fff; border-radius: 8px; padding: 6% 6%; display: grid; grid-template-columns: auto 1fr; gap: 4px; font-size: clamp(6px, .6vw, 8.5px); align-items: center; box-shadow: 0 4px 14px -6px rgba(0,0,0,.35); opacity: 0; min-width: 0; }
+.demo-phone .note > span:last-child { min-width: 0; display: grid; gap: 1px; }
+.demo-phone .note .av { width: 2.1em; height: 2.1em; margin: 0; font-size: .85em; }
+.demo-phone .note b { font-size: 1.1em; line-height: 1.1; overflow-wrap: anywhere; }
+.demo-phone .note small { font-size: .9em; color: #4a5160; }
 .demo-ring { position: absolute; z-index: 5; width: 30%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(140,165,255,.9); pointer-events: none; opacity: 0; transform: translate(-50%, -50%); }
 
 /* Product viewer: click to flip, drag to spin */
@@ -1312,7 +1319,12 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
   const DEMO = {
     onyx: () => `<div class="av">↗</div><b>yourwebsite.com</b><small>Opened from a tap</small><i>Open link</i>`,
     custom: () => `<div class="av">${esc((draft.name || "Your name").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase())}</div><b>${esc(draft.name || "Your name")}</b><small>${esc(draft.role || "Your title")}</small><i>Save contact</i>`,
-    pack: () => `<div class="av">TM</div><b>Team member</b><small>${esc(draft.company || "Company name")}</small><i>Save contact</i>`,
+    // One notification per teammate's card, using the names typed on the pack page where there are any.
+    pack: () => {
+      const names = [...teamNames(), "Ana Lopez", "Ben Ito", "Cara Diaz"].slice(0, 3);
+      const initials = n => n.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+      return `<div class="notes">${names.map(n => `<div class="note"><span class="av">${esc(initials(n))}</span><span><b>${esc(n)}</b><small>Save contact</small></span></div>`).join("")}</div>`;
+    },
   };
   async function tapDemo(shot) {
     if (shot.classList.contains("playing")) return;
@@ -1329,15 +1341,31 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
       await phone.animate([{ transform: "translateX(140%) rotate(8deg)" }, { transform: "translateX(0) rotate(0)" }], opts(450)).finished;
       const toPhone = [{ transform: "none" }, { transform: "translate(22%, -6%) rotate(-10deg) scale(.86)" }];
       await item.animate(toPhone, opts(420)).finished;
-      const pr = phone.getBoundingClientRect(), sr = shot.getBoundingClientRect();
-      const ring = document.createElement("span");
-      ring.className = "demo-ring";
-      ring.style.left = (pr.left - sr.left + pr.width / 2) + "px";
-      ring.style.top = (pr.top - sr.top + pr.height * .3) + "px";
-      shot.appendChild(ring);
-      ring.animate([{ opacity: .9, transform: "translate(-50%,-50%) scale(.3)" }, { opacity: 0, transform: "translate(-50%,-50%) scale(1.6)" }], { duration: reduced() ? 1 : 700, easing: "ease-out" }).finished.then(() => ring.remove());
-      await sheet.animate([{ opacity: 0, transform: "translateY(30%)" }, { opacity: 1, transform: "none" }], opts(380, { delay: reduced() ? 0 : 180 })).finished;
-      await new Promise(r => setTimeout(r, 1300));
+      const pulse = () => {
+        const pr = phone.getBoundingClientRect(), sr = shot.getBoundingClientRect();
+        const ring = document.createElement("span");
+        ring.className = "demo-ring";
+        ring.style.left = (pr.left - sr.left + pr.width / 2) + "px";
+        ring.style.top = (pr.top - sr.top + pr.height * .3) + "px";
+        shot.appendChild(ring);
+        ring.animate([{ opacity: .9, transform: "translate(-50%,-50%) scale(.3)" }, { opacity: 0, transform: "translate(-50%,-50%) scale(1.6)" }], { duration: reduced() ? 1 : 700, easing: "ease-out" }).finished.then(() => ring.remove());
+      };
+      const notes = phone.querySelectorAll(".note");
+      if (notes.length) {
+        // Several taps in a row: each one presses the card again and drops in a new notification.
+        sheet.style.opacity = 1; sheet.style.transform = "none";
+        for (const n of notes) {
+          pulse();
+          if (!reduced()) item.animate([toPhone[1], { transform: "translate(24%, -4%) rotate(-10deg) scale(.83)" }, toPhone[1]], { duration: 260, easing: "ease-out" });
+          await n.animate([{ opacity: 0, transform: "translateY(-40%) scale(.96)" }, { opacity: 1, transform: "none" }], opts(320, { delay: reduced() ? 0 : 80 })).finished;
+          await new Promise(r => setTimeout(r, reduced() ? 0 : 380));
+        }
+        await new Promise(r => setTimeout(r, 1100));
+      } else {
+        pulse();
+        await sheet.animate([{ opacity: 0, transform: "translateY(30%)" }, { opacity: 1, transform: "none" }], opts(380, { delay: reduced() ? 0 : 180 })).finished;
+        await new Promise(r => setTimeout(r, 1300));
+      }
       item.animate([toPhone[1], toPhone[0]], opts(420));
       await phone.animate([{ transform: "none", opacity: 1 }, { transform: "translateX(140%) rotate(8deg)", opacity: 1 }], opts(420, { delay: 120 })).finished;
       item.getAnimations().forEach(a => a.cancel());
