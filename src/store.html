@@ -119,8 +119,8 @@ main { min-height: 70vh; }
 .stack .ghost-card { position: absolute; inset: 0; border-radius: 4.6% / 7.3%; background: var(--c-bg); transition: transform .5s var(--ease); }
 .stack .ghost-card.g1 { transform: translate(5%, -7%) rotate(4deg); z-index: 2; filter: brightness(.82); }
 .stack .ghost-card.g2 { transform: translate(10%, -14%) rotate(8deg); z-index: 1; filter: brightness(.66); }
-.tile:hover .stack .g1 { transform: translate(7%, -10%) rotate(6deg); }
-.tile:hover .stack .g2 { transform: translate(14%, -20%) rotate(11deg); }
+.tile:hover .stack .g1, .tile .shot:focus-visible .stack .g1 { transform: translate(7%, -10%) rotate(6deg); }
+.tile:hover .stack .g2, .tile .shot:focus-visible .stack .g2 { transform: translate(14%, -20%) rotate(11deg); }
 
 /* Home: night hero */
 .night { background: var(--night); color: var(--night-ink); position: relative; overflow: hidden; isolation: isolate; }
@@ -231,8 +231,7 @@ main { min-height: 70vh; }
 .viewer { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 86px); border-radius: 28px; padding: clamp(36px, 7vw, 88px) clamp(20px, 4vw, 48px) 28px; display: grid; place-items: center; gap: 28px; perspective: 1400px; overflow: hidden; isolation: isolate; }
 .viewer.v-onyx, .viewer.v-custom, .viewer.v-pack { background: radial-gradient(100% 80% at 50% 10%, #262932, #08090c 80%); }
 .viewer .flip { --w: 460px; width: min(var(--w), 100%); max-width: 100%; position: relative; transform-style: preserve-3d; transition: transform .8s var(--ease); font-size: clamp(11px, 2.6vw, 19px); }
-.viewer .flip.flipped { transform: rotateY(180deg); }
-.viewer .flip > .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.viewer .flip > .face, .viewer .flip > .face .card { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .viewer .flip > .face.back { position: absolute; inset: 0; transform: rotateY(180deg); }
 .viewer .flip .card, .viewer .flip .stack { --w: 100%; width: 100%; }
 .viewer .tilt { transition: transform .5s var(--ease); transform-style: preserve-3d; width: min(460px, 100%); display: grid; place-items: center; }
@@ -329,8 +328,7 @@ main:focus, [tabindex="-1"]:focus { outline: none; }
 .ship-note { margin-top: 12px; font-size: 14px; color: var(--muted); }
 
 /* Consent checkboxes */
-.check { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 14px; margin-top: 14px; cursor: pointer; }
-.check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--signal-fill); }
+.check { display: grid; grid-template-columns: 20px 1fr; position: relative; gap: 10px; align-items: start; font-size: 14px; margin-top: 14px; cursor: pointer; }
 .check a { color: var(--ink); }
 .check small { display: block; color: var(--muted); font-size: 13px; }
 
@@ -378,6 +376,83 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
 .cookie p { font-size: 14px; color: var(--muted); }
 .cookie .actions { gap: 8px; }
 .cookie .btn { padding: 10px 18px; font-size: 14px; }
+
+/* Pointer light and rim: each card tracks --mx/--my while the pointer is over it */
+.card { box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 1px 0 rgba(255,255,255,.16) inset, 0 0 0 1px rgba(5,8,20,.35), 0 34px 60px -30px rgba(5,8,20,.6), 0 14px 26px -18px rgba(5,8,20,.4); }
+.card .c-glow { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; opacity: 0; transition: opacity .4s var(--ease); background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.17), transparent 45%); }
+.card .c-glow::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.95), rgba(170,190,255,.35) 28%, transparent 60%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.card.lit .c-glow { opacity: 1; }
+
+/* Live engraving: letters are etched in one by one behind a laser spark */
+.card.engraved .c-name { background: none; color: #d4d7dc; -webkit-background-clip: border-box; background-clip: border-box; }
+.card.engraved .c-name, .card.engraved .c-role { position: relative; }
+.card.engraved .c-name .t { position: relative; display: inline-block; }
+.card.engraved .ch { --final: #d4d7dc; }
+.card.engraved .c-role .ch { --final: #9da1a9; }
+.card.engraved.etch .ch { animation: etch .5s var(--ease) both; animation-delay: calc(var(--i) * 42ms); }
+@keyframes etch {
+  0% { opacity: 0; color: #fff; text-shadow: 0 0 0 transparent; }
+  25% { opacity: 1; color: #fff; text-shadow: 0 0 .35em rgba(150,180,255,.95), 0 0 .1em #fff; }
+  100% { opacity: 1; color: var(--final); text-shadow: 0 0 0 transparent; }
+}
+.card.engraved .c-name .t::after { content: ""; position: absolute; top: 50%; left: 0; width: .55em; height: .55em; margin: -.275em 0 0 -.275em; border-radius: 50%; background: radial-gradient(circle, #fff 0 18%, rgba(150,180,255,.85) 35%, transparent 70%); opacity: 0; pointer-events: none; }
+.card.engraved.etch .c-name .t::after { animation: laser calc(var(--n) * 42ms + 120ms) linear both; }
+@keyframes laser { 0% { left: 0; opacity: 1; } 92% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+/* Tap demo inside each product tile */
+.tile { position: relative; }
+.tile .shot { cursor: pointer; border: 0; width: 100%; }
+.tile .shot:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+.tile .try { position: absolute; right: 12px; bottom: 12px; z-index: 5; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(10,12,18,.62); border: 1px solid rgba(255,255,255,.18); padding: 7px 10px; border-radius: 999px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: opacity .3s; }
+.tile .shot.playing .try { opacity: 0; }
+.tile h3 a { text-decoration: none; }
+.tile .body { position: relative; }
+.tile h3 a::after { content: ""; position: absolute; inset: -8px -10px -12px; }
+.tile h3 a:focus-visible { outline: none; }
+.tile:has(h3 a:focus-visible) { outline: 2px solid var(--signal); outline-offset: 3px; }
+.demo-phone { position: absolute; z-index: 4; right: 7%; top: 9%; height: 82%; aspect-ratio: 9 / 19; border-radius: 16% / 7.5%; background: #0b0c10; padding: 3.5%; box-shadow: 0 0 0 1px rgba(255,255,255,.22), 0 20px 40px -16px rgba(0,0,0,.7); pointer-events: none; }
+.demo-phone .scr { width: 100%; height: 100%; border-radius: 13% / 6%; background: #f6f7f9; color: #101217; display: grid; align-content: end; padding: 10% 9%; overflow: hidden; position: relative; }
+.demo-phone .notch { position: absolute; top: 4%; left: 50%; width: 30%; height: 3%; border-radius: 99px; background: #0b0c10; transform: translateX(-50%); }
+.demo-phone .sheet { background: #fff; border-radius: 10px; padding: 9% 9% 10%; box-shadow: 0 6px 20px -8px rgba(0,0,0,.35); display: grid; gap: 4px; font-size: clamp(7px, .75vw, 10px); opacity: 0; transform: translateY(30%); }
+.demo-phone .sheet b { font: 600 1.25em/1.1 var(--display); overflow-wrap: anywhere; }
+.demo-phone .sheet small { color: #5d6471; font-size: .95em; overflow-wrap: anywhere; }
+.demo-phone .sheet i { display: block; margin-top: 4px; font-style: normal; text-align: center; background: #2b47ff; color: #fff; border-radius: 99px; padding: 5px 4px; font-weight: 600; }
+.demo-phone .av { width: 2.6em; height: 2.6em; border-radius: 50%; background: #101217; color: #fff; display: grid; place-items: center; font-weight: 700; margin-bottom: 2px; }
+.demo-ring { position: absolute; z-index: 5; width: 30%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(140,165,255,.9); pointer-events: none; opacity: 0; transform: translate(-50%, -50%); }
+
+/* Product viewer: click to flip, drag to spin */
+.viewer .tilt { cursor: grab; touch-action: pan-y; border-radius: 16px; perspective: 1400px; transform-style: flat; }
+.viewer .tilt.dragging { cursor: grabbing; }
+.viewer .tilt:focus-visible { outline: 2px solid #8ea0ff; outline-offset: 10px; }
+.viewer .hint { font-size: 13px; color: #b9bec8; display: flex; gap: 8px; align-items: center; }
+.viewer .hint kbd { font: 500 11px/1 var(--mono); border: 1px solid rgba(255,255,255,.25); border-radius: 5px; padding: 3px 5px; }
+
+/* Business Pack fan */
+.fan { position: relative; width: 100%; transition: transform .6s var(--ease); }
+.fan .card { --w: 100%; width: 100%; position: absolute; inset: 0; transition: transform .6s var(--ease); transition-delay: calc(var(--i) * 35ms); transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); z-index: calc(10 - var(--i)); }
+.fan .card:first-child { position: relative; }
+.fan .card:not(:first-child) { filter: brightness(calc(1 - var(--i) * .07)); }
+.fan.open { transform: scale(.8); }
+.fan.open .card { transform: translate(var(--fx), var(--fy)) rotate(var(--fr)); }
+
+/* Rolling prices */
+.roll { font-variant-numeric: tabular-nums; }
+
+/* Checkbox that draws its tick */
+.check .box { position: relative; width: 20px; height: 20px; margin-top: 1px; }
+.check input { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 0; border: 1.5px solid var(--muted); border-radius: 6px; background: var(--surface); cursor: pointer; transition: background .2s, border-color .2s, transform .15s var(--ease); display: block; }
+.check input:active { transform: scale(.9); }
+.check input:checked { background: var(--signal-fill); border-color: var(--signal-fill); }
+.check input:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.check input[aria-invalid="true"] { border-color: var(--danger); }
+.check svg { position: absolute; inset: 0; width: 20px; height: 20px; pointer-events: none; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.check svg path { stroke-dasharray: 17; stroke-dashoffset: 17; transition: stroke-dashoffset .38s var(--ease) .06s; }
+.check input:checked + svg path { stroke-dashoffset: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card.engraved.etch .ch, .card.engraved.etch .c-name .t::after { animation: none !important; }
+  .fan, .fan .card, .check svg path, .card .c-glow { transition: none !important; }
+}
 </style>
 
 <button type="button" class="skip" id="skip">Skip to main content</button>
@@ -492,15 +567,37 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
       style = `--c-bg:linear-gradient(150deg, ${shade(c, 18)}, ${c} 55%, ${shade(c, -22)});--c-ink:${inkFor(c)}`;
       if (o.kind === "pack" && o.company) mark = o.company;
     }
-    if (o.back) return `<div class="${cls} card-back" style="${style}" role="img" aria-label="Back of the card: NFC symbol and the words Tap to connect">${WAVE}<span class="c-tap" aria-hidden="true">Tap to connect</span></div>`;
+    const glow = `<span class="c-glow" aria-hidden="true"></span>`;
+    if (o.back) return `<div class="${cls} card-back" style="${style}" role="img" aria-label="Back of the card: NFC symbol and the words Tap to connect">${WAVE}<span class="c-tap" aria-hidden="true">Tap to connect</span>${glow}</div>`;
     const brand = o.logo ? `<img class="c-logo" src="${o.logo}" alt="">` : `<span class="c-mark">${esc(mark)}</span>`;
     const label = o.kind === "onyx"
       ? "Onyx card: matte black with the Handshake wordmark and an NFC symbol"
       : `${o.kind === "pack" ? "Business Pack card" : "Engraved Onyx card"} for ${o.name}${o.role ? ", " + o.role : ""}${o.logo ? ", with your logo" : ""}`;
     return `<div class="${cls}" style="${style}" role="img" aria-label="${esc(label)}">
       <div class="c-top">${brand}${WAVE}</div>
-      <div class="c-body">${o.kind === "onyx" ? `<div class="c-role">Tap to connect</div>` : `<div class="c-name">${esc(o.name)}</div><div class="c-role">${esc(o.role)}</div>`}</div>
+      <div class="c-body">${o.kind === "onyx" ? `<div class="c-role">Tap to connect</div>`
+        : o.kind === "engraved" ? etched(o.name, o.role)
+        : `<div class="c-name">${esc(o.name)}</div><div class="c-role">${esc(o.role)}</div>`}</div>
+      ${glow}
     </div>`;
+  }
+  // Engraved text is split into letters so hovering can etch them in one at a time.
+  function etched(name, role) {
+    const chars = (str, start) => [...str].map((c, i) => `<span class="ch" style="--i:${start + i}">${esc(c)}</span>`).join("");
+    const n = [...name].length;
+    return `<div class="c-name"><span class="t" style="--n:${n}">${chars(name, 0)}</span></div><div class="c-role">${chars(role, n)}</div>`;
+  }
+  // Business Pack: one card per team member (up to 5), stacked; .open fans them out.
+  function fan(o) {
+    const names = teamNames();
+    const count = Math.min(5, Math.max(3, names.length));
+    const mid = (count - 1) / 2;
+    return `<div class="fan" id="fan">${Array.from({ length: count }, (_, i) => {
+      const d = i - mid, order = i === 0 ? 0 : i; // first card stays on top
+      const pos = i === 0 ? 0 : (i % 2 ? Math.ceil(i / 2) : -Math.ceil(i / 2));
+      const vars = `--i:${order};--sx:${i * 3}%;--sy:${-i * 4}%;--sr:${i * 3}deg;--fx:${pos * 26}%;--fy:${Math.abs(pos) * 6}%;--fr:${pos * 9}deg`;
+      return card({ ...o, name: names[i] || "Team member" }).replace('style="', `style="${vars};`);
+    }).join("")}</div>`;
   }
   function stack(o, vt) {
     const c = o.color || "#2b47ff";
@@ -517,13 +614,13 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
     const vt = id => withVT ? "card-" + id : null;
     const t = (id, shot) => {
       const p = PRODUCTS[id];
-      return `<a class="tile" href="#card-${id}">
-        <div class="shot s-${id}">${shot}</div>
+      return `<div class="tile">
+        <div class="shot s-${id}" role="button" tabindex="0" data-demo="${id}" aria-label="Show a tap demo for ${p.name}">${shot}<span class="try" aria-hidden="true">Click to see a tap</span></div>
         <div class="body">
-          <div class="meta"><h3>${p.name}</h3><span class="price">${money(p.price)}</span></div>
+          <div class="meta"><h3><a href="#card-${id}">${p.name}</a></h3><span class="price">${money(p.price)}</span></div>
           <p>${p.kicker}.</p>
-          <span class="go">View ${p.name} ${ARROW}</span>
-        </div></a>`;
+          <span class="go" aria-hidden="true">View ${p.name} ${ARROW}</span>
+        </div></div>`;
     };
     const onyx = card(onyxCard());
     const custom = card({ kind: "engraved", name: SAMPLE.name, role: SAMPLE.role });
@@ -670,8 +767,8 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
         priceHtml = `<span class="price-lg" id="price">${money(p.price)}</span>`;
         fields = nameFields() + logoField("Engraved in the top-left corner. A PNG or SVG with a transparent background works best.");
       } else {
-        preview = stack(packCard());
-        priceHtml = `<span class="price-lg"><span id="price">${money(packPrice())}</span><small id="per">${perCard()}</small></span>`;
+        preview = fan(packCard());
+        priceHtml = `<span class="price-lg"><span class="roll" id="price" data-v="${packPrice()}">${money(packPrice())}</span><small id="per">${perCard()}</small></span>`;
         fields = `
           ${PACKS.length < 2 ? "" : `<div class="field"><span class="flabel">Pack size</span>
             <div class="seg" id="packSeg">${PACKS.map(k => `<button type="button" data-size="${k.size}" aria-pressed="${k.size === draft.packSize}">${k.size} cards<small>${money(k.price)}</small></button>`).join("")}</div>
@@ -685,13 +782,13 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
       <nav class="wrap crumbs" aria-label="Breadcrumb"><a href="#shop">Shop</a><span aria-hidden="true">/</span><span aria-current="page">${p.name}</span></nav>
       <section class="wrap pdp">
         <div class="viewer v-${id}" id="viewer">
-          <div class="tilt" id="tilt">
-            <div class="flip" id="flip" style="view-transition-name:card-${id}">
+          <div class="tilt" id="tilt" style="view-transition-name:card-${id}" tabindex="0" role="button" aria-label="Turn the card over. You can also drag it, or use the left and right arrow keys.">
+            <div class="flip" id="flip">
               <div class="face front" id="front">${preview}</div>
               <div class="face back" id="back" aria-hidden="true">${card({ ...backO, back: true })}</div>
             </div>
           </div>
-          <div class="tools"><button type="button" class="chip-btn" id="flipBtn" aria-pressed="false">Show back</button></div>
+          <p class="hint" id="hint">Click to flip, drag to spin it around</p>
         </div>
         <div class="buy">
           <span class="label">${p.kicker}</span>
@@ -701,7 +798,7 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
           ${fields}
           <div class="buy-row">
             ${id === "pack" ? "" : `<div class="qty" role="group" aria-label="Quantity"><button type="button" id="q-dec" aria-label="Decrease quantity">&minus;</button><output id="q-val" aria-live="polite">1</output><button type="button" id="q-inc" aria-label="Increase quantity">+</button></div>`}
-            <button class="btn primary" id="add" type="button">Add to cart</button>
+            <button class="btn primary" id="add" type="button">Add to cart · <span class="roll" id="addTotal" data-v="${id === "pack" ? packPrice() : p.price}">${money(id === "pack" ? packPrice() : p.price)}</span></button>
           </div>
           <p class="ship-note">${SHIP_TEXT}</p>
           <dl class="facts">
@@ -732,7 +829,7 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
               ${vis}
               <div><h2 style="font-size:20px;font-weight:600">${nm}</h2><div class="sub">${esc(l.desc)}</div></div>
               <div class="right">
-                <span class="amt">${money(l.unit * l.qty)}</span>
+                <span class="amt roll" data-roll="line:${esc(l.key)}" data-to="${l.unit * l.qty}">${money(l.unit * l.qty)}</span>
                 <div class="qty" role="group" aria-label="Quantity of ${nm}"><button type="button" data-dec="${i}" aria-label="Decrease quantity of ${nm}">&minus;</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="Increase quantity of ${nm}">+</button></div>
                 <button class="link-btn" type="button" data-rm="${i}">Remove<span class="sr-only"> ${nm}</span></button>
               </div>
@@ -740,14 +837,14 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
         </div>
         <aside class="summary" aria-labelledby="sum-title">
           <h2 id="sum-title" style="font-size:22px;font-weight:600;margin-bottom:14px">Order summary</h2>
-          <div class="row"><span>Subtotal</span><span>${money(sub)}</span></div>
+          <div class="row"><span>Subtotal</span><span class="roll" data-roll="sub" data-to="${sub}">${money(sub)}</span></div>
           <div class="row"><span>Shipping</span><span>${ship ? money(ship) : "Free"}</span></div>
           <div class="row"><span>Sales tax</span><span>Shown before you pay</span></div>
-          <div class="row total"><span>Total before tax</span><span>${money(sub + ship)}</span></div>
+          <div class="row total"><span>Total before tax</span><span class="roll" data-roll="total" data-to="${sub + ship}">${money(sub + ship)}</span></div>
           <form id="checkoutForm" novalidate>
-            <label class="check" for="c-terms"><input type="checkbox" id="c-terms" required aria-describedby="err-terms"><span>I agree to the <a href="#terms">terms and conditions</a> and have read the <a href="#privacy">privacy policy</a> and <a href="#refunds">refund policy</a>.</span></label>
+            <label class="check" for="c-terms"><span class="box"><input type="checkbox" id="c-terms" required aria-describedby="err-terms"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10.5l3.4 3.4L15.2 6.6"/></svg></span><span>I agree to the <a href="#terms">terms and conditions</a> and have read the <a href="#privacy">privacy policy</a> and <a href="#refunds">refund policy</a>.</span></label>
             <span class="err" id="err-terms" aria-live="polite" style="display:block;color:var(--danger);font-size:13px;margin-top:6px"></span>
-            <label class="check" for="c-news"><input type="checkbox" id="c-news"><span>Email me about new cards and offers. <small>Optional. You can unsubscribe from any email.</small></span></label>
+            <label class="check" for="c-news"><span class="box"><input type="checkbox" id="c-news"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10.5l3.4 3.4L15.2 6.6"/></svg></span><span>Email me about new cards and offers. <small>Optional. You can unsubscribe from any email.</small></span></label>
             <button class="btn primary full" type="submit" id="checkout" style="margin-top:18px">Checkout ${ARROW}</button>
           </form>
           <p class="note">${ship ? `Orders of ${money(SHIPPING.freeOver)} or more ship free.` : "Your order ships free."} Checkout is a demo and no payment is taken.</p>
@@ -968,7 +1065,7 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
 
   function wire(r) {
     if (r.name === "product" && PRODUCTS[r.arg]) wireProduct(r.arg);
-    if (r.name === "cart") wireCart();
+    if (r.name === "cart") { wireCart(); rollCart(); }
     if (r.name === "cookies") document.getElementById("clearData").onclick = () => {
       try { localStorage.removeItem("handshake-cart"); localStorage.removeItem("handshake-cookie-notice"); } catch (e) {}
       cart = []; updateCount(); toast("Your cart and settings were removed from this browser.");
@@ -980,27 +1077,65 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
     const front = document.getElementById("front"), back = document.getElementById("back");
     const $ = s => document.getElementById(s);
 
-    viewer.addEventListener("pointermove", e => {
-      if (reduced() || e.pointerType === "touch") return;
-      const b = viewer.getBoundingClientRect();
-      const x = (e.clientX - b.left) / b.width - .5, y = (e.clientY - b.top) / b.height - .5;
-      tilt.style.transition = "transform .12s linear";
-      tilt.style.transform = `rotateY(${x * 20}deg) rotateX(${-y * 16}deg)`;
-    });
-    viewer.addEventListener("pointerleave", () => { tilt.style.transition = ""; tilt.style.transform = ""; });
-    $("flipBtn").onclick = () => {
-      const f = flip.classList.toggle("flipped");
-      $("flipBtn").textContent = f ? "Show front" : "Show back";
-      $("flipBtn").setAttribute("aria-pressed", f);
-      front.setAttribute("aria-hidden", f); back.setAttribute("aria-hidden", !f);
+    // Turning the card: click flips it, dragging spins it freely and it settles on the nearest side.
+    let ry = 0, rx = 0, drag = null, fanOpen = false, q = 1;
+    const showing = () => ((Math.round(ry / 180) % 2) + 2) % 2 ? "back" : "front";
+    const apply = (animate) => {
+      flip.style.transition = animate ? "" : "none";
+      flip.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
     };
+    const settle = () => {
+      ry = Math.round(ry / 180) * 180; rx = 0; apply(true);
+      const b = showing() === "back";
+      front.setAttribute("aria-hidden", b); back.setAttribute("aria-hidden", !b);
+    };
+    const turn = dir => { ry += 180 * dir; settle(); };
+    tilt.addEventListener("pointerdown", e => {
+      if (e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, ry, moved: false };
+      tilt.setPointerCapture(e.pointerId);
+    });
+    tilt.addEventListener("pointermove", e => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.hypot(dx, dy) < 6) return;
+      drag.moved = true; tilt.classList.add("dragging");
+      ry = drag.ry + dx * 0.6; rx = Math.max(-25, Math.min(25, -dy * 0.2));
+      apply(false);
+    });
+    const end = e => {
+      if (!drag) return;
+      const moved = drag.moved; drag = null; tilt.classList.remove("dragging");
+      if (e.type === "pointercancel") { settle(); return; }
+      moved ? settle() : turn(1);
+    };
+    tilt.addEventListener("pointerup", end);
+    tilt.addEventListener("pointercancel", end);
+    tilt.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); turn(1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); turn(1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); turn(-1); }
+    });
+
+    // Business Pack: fan the team's cards out while the pointer is over the preview or the names are being edited.
+    const setFan = open => { fanOpen = open; const f = $("fan"); if (f) f.classList.toggle("open", open && !reduced()); };
+    if (id === "pack") {
+      viewer.addEventListener("pointerenter", () => setFan(true));
+      viewer.addEventListener("pointerleave", () => { if (document.activeElement !== $("f-team")) setFan(false); });
+      tilt.addEventListener("focus", () => setFan(true));
+      tilt.addEventListener("blur", () => setFan(false));
+    }
+
+    const unitPrice = () => id === "onyx" ? PRODUCTS.onyx.price : id === "custom" ? PRODUCTS.custom.price : packPrice();
+    const updateTotal = () => { roll($("addTotal"), unitPrice() * (id === "pack" ? 1 : q)); if ($("price") && id === "pack") roll($("price"), packPrice()); };
 
     const cardObj = () => id === "onyx" ? onyxCard() : id === "custom" ? customCard() : packCard();
     const refresh = () => {
       const o = cardObj();
-      front.innerHTML = id === "pack" ? stack(o) : card(o);
+      front.innerHTML = id === "pack" ? fan(o) : card(o);
       back.innerHTML = card({ ...o, back: true });
-      if ($("price") && id === "pack") $("price").textContent = money(packPrice());
+      if (id === "pack") setFan(fanOpen);
+      updateTotal();
       if ($("per")) $("per").textContent = perCard();
       if ($("teamCount")) {
         const n = teamNames().length, s = draft.packSize;
@@ -1053,10 +1188,13 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
       drop.addEventListener("drop", e => take(e.dataTransfer.files[0]));
     }
 
-    let q = 1;
     if ($("q-val")) {
-      $("q-dec").onclick = () => { q = Math.max(1, q - 1); $("q-val").textContent = q; };
-      $("q-inc").onclick = () => { q = Math.min(50, q + 1); $("q-val").textContent = q; };
+      $("q-dec").onclick = () => { q = Math.max(1, q - 1); $("q-val").textContent = q; updateTotal(); };
+      $("q-inc").onclick = () => { q = Math.min(50, q + 1); $("q-val").textContent = q; updateTotal(); };
+    }
+    if ($("f-team")) {
+      $("f-team").addEventListener("focus", () => setFan(true));
+      $("f-team").addEventListener("blur", () => setFan(false));
     }
 
     // Engraved products need real text from the customer, never the sample preview text.
@@ -1109,6 +1247,97 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
       toast("Checkout is coming soon. This is a demo store and no payment is taken.");
     });
   }
+
+  // Prices roll from their old value to the new one instead of jumping.
+  function roll(el, to) {
+    if (!el) return;
+    const from = el.dataset.v != null ? +el.dataset.v : to;
+    el.dataset.v = to;
+    cancelAnimationFrame(el._raf);
+    if (reduced() || from === to) { el.textContent = money(to); return; }
+    const t0 = performance.now(), dur = 520;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = money(Math.round((from + (to - from) * e) * 100) / 100);
+      if (k < 1) el._raf = requestAnimationFrame(step);
+    };
+    el._raf = requestAnimationFrame(step);
+  }
+  const rolled = {};
+  function rollCart() {
+    view.querySelectorAll("[data-roll]").forEach(el => {
+      const key = el.dataset.roll, to = +el.dataset.to;
+      el.dataset.v = rolled[key] ?? to;
+      roll(el, to);
+      rolled[key] = to;
+    });
+  }
+
+  // Light that follows the pointer across any card, with a bright rim near the pointer.
+  let litCard = null;
+  document.addEventListener("pointermove", e => {
+    if (e.pointerType === "touch") return;
+    const c = e.target.closest && e.target.closest(".card");
+    if (litCard && litCard !== c) litCard.classList.remove("lit");
+    litCard = c;
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", ((e.clientX - r.left) / r.width * 100).toFixed(1) + "%");
+    c.style.setProperty("--my", ((e.clientY - r.top) / r.height * 100).toFixed(1) + "%");
+    c.classList.add("lit");
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => { if (litCard) litCard.classList.remove("lit"); litCard = null; });
+
+  // Live engraving: hovering an engraved card etches its letters in again.
+  const etch = c => { if (reduced()) return; c.classList.remove("etch"); void c.offsetWidth; c.classList.add("etch"); };
+  document.addEventListener("pointerover", e => {
+    const c = e.target.closest && e.target.closest(".card.engraved");
+    if (c && !c.contains(e.relatedTarget)) etch(c);
+  });
+  document.addEventListener("focusin", e => { const c = e.target.querySelector && e.target.querySelector(".card.engraved"); if (c) etch(c); });
+
+  // Tap demo: clicking a product tile's card slides in a phone and shows what opens.
+  const DEMO = {
+    onyx: () => `<div class="av">↗</div><b>yourwebsite.com</b><small>Opened from a tap</small><i>Open link</i>`,
+    custom: () => `<div class="av">${esc((draft.name || "Your name").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase())}</div><b>${esc(draft.name || "Your name")}</b><small>${esc(draft.role || "Your title")}</small><i>Save contact</i>`,
+    pack: () => `<div class="av">TM</div><b>Team member</b><small>${esc(draft.company || "Company name")}</small><i>Save contact</i>`,
+  };
+  async function tapDemo(shot) {
+    if (shot.classList.contains("playing")) return;
+    shot.classList.add("playing");
+    const item = shot.firstElementChild;
+    const phone = document.createElement("div");
+    phone.className = "demo-phone"; phone.setAttribute("aria-hidden", "true");
+    phone.innerHTML = `<div class="scr"><span class="notch"></span><div class="sheet">${DEMO[shot.dataset.demo]()}</div></div>`;
+    shot.appendChild(phone);
+    const sheet = phone.querySelector(".sheet");
+    const ease = "cubic-bezier(.2,.8,.2,1)";
+    const opts = (duration, extra = {}) => ({ duration: reduced() ? 1 : duration, easing: ease, fill: "forwards", ...extra });
+    try {
+      await phone.animate([{ transform: "translateX(140%) rotate(8deg)" }, { transform: "translateX(0) rotate(0)" }], opts(450)).finished;
+      const toPhone = [{ transform: "none" }, { transform: "translate(22%, -6%) rotate(-10deg) scale(.86)" }];
+      await item.animate(toPhone, opts(420)).finished;
+      const pr = phone.getBoundingClientRect(), sr = shot.getBoundingClientRect();
+      const ring = document.createElement("span");
+      ring.className = "demo-ring";
+      ring.style.left = (pr.left - sr.left + pr.width / 2) + "px";
+      ring.style.top = (pr.top - sr.top + pr.height * .3) + "px";
+      shot.appendChild(ring);
+      ring.animate([{ opacity: .9, transform: "translate(-50%,-50%) scale(.3)" }, { opacity: 0, transform: "translate(-50%,-50%) scale(1.6)" }], { duration: reduced() ? 1 : 700, easing: "ease-out" }).finished.then(() => ring.remove());
+      await sheet.animate([{ opacity: 0, transform: "translateY(30%)" }, { opacity: 1, transform: "none" }], opts(380, { delay: reduced() ? 0 : 180 })).finished;
+      await new Promise(r => setTimeout(r, 1300));
+      item.animate([toPhone[1], toPhone[0]], opts(420));
+      await phone.animate([{ transform: "none", opacity: 1 }, { transform: "translateX(140%) rotate(8deg)", opacity: 1 }], opts(420, { delay: 120 })).finished;
+      item.getAnimations().forEach(a => a.cancel());
+    } finally {
+      phone.remove(); shot.classList.remove("playing");
+    }
+  }
+  view.addEventListener("click", e => { const s = e.target.closest("[data-demo]"); if (s) tapDemo(s); });
+  view.addEventListener("keydown", e => {
+    const s = e.target.closest && e.target.closest("[data-demo]");
+    if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); tapDemo(s); }
+  });
 
   // Cookie notice: informational only, since the site sets no optional cookies.
   function showCookie(show) { cookieEl.hidden = !show; }
