@@ -35,7 +35,7 @@ Only what's needed to make and ship the order: engraving text, an optional logo,
 
 ## Pricing and fees
 
-Shipping ($6, or free from $75) is shown on every product page, in the comparison table, the FAQ and the cart before checkout. Sales tax is shown as its own line. The metal finish surcharge is shown on the button that selects it. There are no other fees.
+Shipping ($6, or free from $75) is shown on every product page, in the comparison table, the FAQ and the cart before checkout. Sales tax is shown as its own line. There are no other fees.
 
 ## Reviews
 

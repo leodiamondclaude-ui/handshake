@@ -110,7 +110,6 @@ main { min-height: 70vh; }
 .card.onyx .c-name, .card.onyx .c-mark { background: linear-gradient(180deg, #f4f5f7, #a9adb5); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .card.f-gloss { --c-sheen: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.28) 45%, transparent 58%), radial-gradient(120% 80% at 10% 0%, rgba(255,255,255,.22), transparent 55%); }
 .card.f-matte { --c-sheen: radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,.1), transparent 60%); }
-.card.f-metal { --c-sheen: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px), linear-gradient(115deg, transparent 30%, rgba(255,255,255,.35) 46%, transparent 60%); }
 .card-back { justify-content: center; align-items: center; gap: .6em; text-align: center; }
 .card-back .c-wave { width: 3em; height: 3em; opacity: .9; }
 .card-back .c-tap { font: 500 .6em/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; opacity: .6; }
@@ -449,7 +448,7 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
 
   const COLORS = ["#2b47ff", "#0e0f12", "#f4f1ea", "#e8483b", "#1f7a5a", "#f2b630", "#8e6cf0", "#ff8fb1"];
   const COLOR_NAMES = { "#2b47ff": "Cobalt", "#0e0f12": "Black", "#f4f1ea": "Ivory", "#e8483b": "Red", "#1f7a5a": "Green", "#f2b630": "Yellow", "#8e6cf0": "Violet", "#ff8fb1": "Pink" };
-  const FINISHES = { matte: { label: "Matte", add: 0 }, gloss: { label: "Gloss", add: 0 }, metal: { label: "Metal", add: 10 } };
+  const FINISHES = { matte: { label: "Matte", add: 0 }, gloss: { label: "Gloss", add: 0 } };
 
   const money = n => "$" + n.toFixed(2).replace(/\.00$/, "");
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -653,7 +652,7 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
               <tr><th scope="row">Cards</th>${y("1")}${y("1")}${y(String(PACKS[0].size))}</tr>
               <tr><th scope="row">Card color</th>${y("Matte black")}${y("Matte black (Onyx)")}${y("Your choice")}</tr>
               <tr><th scope="row">Engraving</th>${n("None")}${y("Name, title and logo")}${y("Names and company logo")}</tr>
-              <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte")}${y("Matte, gloss, or metal for " + money(FINISHES.metal.add) + " more")}</tr>
+              <tr><th scope="row">Finish</th>${y("Matte")}${y("Matte")}${y("Matte or gloss")}</tr>
               <tr><th scope="row">Shipping</th><td colspan="3">${money(SHIPPING.flat)}, or free on orders of ${money(SHIPPING.freeOver)} or more</td></tr>
             </tbody>
           </table>
