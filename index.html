@@ -173,7 +173,10 @@ main { min-height: 70vh; }
 .tile .shot.s-custom { background: radial-gradient(90% 80% at 50% 20%, #3a3d46, #101115 70%, #08090b); }
 .tile .shot.s-pack { background: radial-gradient(90% 80% at 50% 20%, #e4e8f2, #c7cede); }
 .tile .card, .tile .stack { --w: 100%; font-size: clamp(9px, 1.1vw, 12px); transition: transform .5s var(--ease); }
-.tile:hover .shot > .card { transform: rotate(-3deg) scale(1.04); }
+.tile .shot, .tile .shot > div { perspective: 1000px; }
+.spin { position: relative; width: 100%; transform-style: preserve-3d; }
+.spin > .face, .spin > .face .card { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.spin > .face.back { position: absolute; inset: 0; transform: rotateY(180deg); }
 .tile .body { padding: 0 10px; display: grid; gap: 10px; }
 .tile .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .tile h3 { font-size: 26px; }
@@ -624,8 +627,10 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
           <span class="go" aria-hidden="true">View ${p.name} ${ARROW}</span>
         </div></div>`;
     };
-    const onyx = card(onyxCard());
-    const custom = card({ kind: "engraved", name: SAMPLE.name, role: SAMPLE.role });
+    // Two-sided so the first-hover spin shows the real back of the card.
+    const twoSided = o => `<div class="spin"><div class="face front">${card(o)}</div><div class="face back" aria-hidden="true">${card({ ...o, back: true })}</div></div>`;
+    const onyx = twoSided(onyxCard());
+    const custom = twoSided({ kind: "engraved", name: SAMPLE.name, role: SAMPLE.role });
     return `<div class="tiers">
       ${t("onyx", withVT ? wrapVT(onyx, vt("onyx")) : onyx)}
       ${t("custom", withVT ? wrapVT(custom, vt("custom")) : custom)}
@@ -1092,6 +1097,13 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
       front.setAttribute("aria-hidden", b); back.setAttribute("aria-hidden", !b);
     };
     const turn = dir => { ry += 180 * dir; settle(); };
+    if (id !== "pack") tilt.addEventListener("pointerenter", () => {
+      if (tilt.dataset.spun || drag || reduced()) return;
+      tilt.dataset.spun = "1";
+      ry += 360;
+      flip.style.transition = "transform 1s cubic-bezier(.45,0,.2,1)";
+      flip.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
     tilt.addEventListener("pointerdown", e => {
       if (e.button !== 0) return;
       drag = { x: e.clientX, y: e.clientY, ry, moved: false };
@@ -1336,6 +1348,15 @@ footer .fine-print { margin-top: 28px; padding-top: 20px; border-top: 1px solid 
     }
   }
   view.addEventListener("click", e => { const s = e.target.closest("[data-demo]"); if (s) tapDemo(s); });
+
+  // Onyx and Customized tiles spin around once the first time the pointer reaches them.
+  view.addEventListener("pointerover", e => {
+    const s = e.target.closest && e.target.closest('[data-demo="onyx"], [data-demo="custom"]');
+    if (!s || s.dataset.spun || s.contains(e.relatedTarget) || s.classList.contains("playing") || reduced()) return;
+    s.dataset.spun = "1";
+    const spin = s.querySelector(".spin");
+    if (spin) spin.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(360deg)" }], { duration: 1000, easing: "cubic-bezier(.45,0,.2,1)" });
+  });
   view.addEventListener("keydown", e => {
     const s = e.target.closest && e.target.closest("[data-demo]");
     if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); tapDemo(s); }
